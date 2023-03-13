@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
     modules: [
         // '@nuxtjs/style-resources',
-        '@pinia/nuxt',
+        // '@pinia/nuxt',
     ],
     css: [
         "ant-design-vue/dist/antd.css",
