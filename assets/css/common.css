@@ -1,0 +1,25 @@
+* {
+    padding: 0px;
+    margin: 0px;
+    font-family: 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', sans-serif;
+    /* font-weight: 800; */
+    /* font-size: 1.1rem; */
+}
+
+li {
+    list-style: none;
+}
+
+a {
+    text-decoration: none;
+    color: #000;
+
+}
+
+input {
+    outline: none;
+}
+
+em {
+    font-weight: 400;
+}

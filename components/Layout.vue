@@ -1,0 +1,168 @@
+<template>
+    <a-layout class="layout">
+      <a-layout-sider v-model:collapsed="collapsed" :trigger="null" collapsible >
+        <div class="logo" />
+        <a-menu v-model:selectedKeys="selectedKeys" theme="light" mode="inline" :style="{height:'calc(100vh - 3.5rem)'}" class="menu">
+          <a-menu-item key="1" @click="navigateTo('/')">
+              <like-outlined />
+              <span>推荐</span>
+          </a-menu-item>
+          <a-menu-item key="2" @click="navigateTo('/discover')">
+              <user-outlined/>
+              <!-- <slot v-html=""></slot> -->
+              <!-- <span v-slot="<user-outlined/>"></span> -->
+              <!-- <span v-html=""></span> -->
+              <!-- <icon-font type="icon-useroutlined" /> -->
+              <!-- <icon-font type="icon-tuichu" /> -->
+              <span>首页</span>
+          </a-menu-item>
+          
+          <a-menu-item key="3" @click="navigateTo('/popular')">
+              <fire-outlined />
+              <span>排行榜</span>
+          </a-menu-item>
+          <a-menu-item key="4" @click="navigateTo('/space')">
+              <crown-outlined />
+              <span>动态</span>
+          </a-menu-item>
+          <a-menu-item key="5" @click="navigateTo('/history')">
+              <clock-circle-outlined />
+              <span>历史</span>
+          </a-menu-item>
+          <!-- 分割线 -->
+          <a-divider style="border-color: #44bc87"  />
+          <a-menu-item key="6" @click="navigateTo('/music')">
+              <customer-service-outlined />
+              <span>音乐</span>
+          </a-menu-item>
+          <a-menu-item key="7" @click="navigateTo('/live')">
+              <video-camera-outlined />
+              <span>直播</span>
+          </a-menu-item>
+          <a-menu-item key="8" @click="navigateTo('/movie')">
+              <play-square-outlined />
+              <span>电影</span>
+          </a-menu-item>
+        </a-menu>
+      </a-layout-sider>
+      <a-layout>
+        <a-layout-header style="background: #fff; padding: 0 10px;line-height: 48px;height:48px">
+          <menu-unfold-outlined v-if="collapsed" class="trigger" @click="() => (collapsed = !collapsed)" />
+          <menu-fold-outlined v-else class="trigger" @click="() => (collapsed = !collapsed)" />
+        </a-layout-header>
+        <a-layout-content :style="{ padding: '0 0px', background: '#fff', minHeight: '280px' }">
+          <nuxt-page></nuxt-page>
+          <!-- <nuxt /> -->
+        </a-layout-content>
+      </a-layout>
+    </a-layout>
+    <!-- <transition name="" mode=""> -->
+      <button class="toTop" @click="toTop" v-show="show"><up-outlined /></button>
+      
+    <!-- </transition> -->
+  </template>
+  <script lang="ts" setup>
+  import {  ref, reactive,onMounted} from 'vue';
+  import {
+    UserOutlined,
+    VideoCameraOutlined,
+    UploadOutlined,
+    MenuUnfoldOutlined,
+    MenuFoldOutlined,
+    ClockCircleOutlined,
+    CustomerServiceOutlined,
+    LikeOutlined,
+    // ClockCircleOutlined,
+    PlaySquareOutlined,
+    CrownOutlined,
+    FireOutlined,
+    UpOutlined,
+  } from '@ant-design/icons-vue';
+  
+  
+  let navData = reactive<object[]>([
+    {
+      html: "<user-outlined /><span>首页</span>",
+      path: "/discover",
+    },
+    {
+      html: "<like-outlined /><span>推荐</span>",
+      path: "/",
+    },
+  ]);
+  
+  const selectedKeys = ref<string[]>(['1']);
+  let collapsed = ref<boolean>(false);
+  
+  // const jump:<T>= (path:T) =>{
+    
+  // }
+  function jump(path: string){
+    // router.push({ path: path });
+    navigateTo(path);
+  }
+  
+  // 回顶按钮
+  const toTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior:'smooth',
+    });
+  }
+  let show = ref(false);
+  onMounted(() => {
+    window.addEventListener("scroll", () => {
+      let html = document.documentElement;
+      if (html.scrollTop > 500) {
+        show.value = true;
+      } else {
+        show.value = false;
+      }
+    })
+  });
+      // };
+    // },
+  // });
+  </script>
+  <style scoped>
+  .toTop{
+    position: fixed;
+    right: 1rem;
+    bottom: 3rem;
+    border: 1px solid #ddd;
+    padding: .5rem;
+  }
+  .layout {
+    height: calc(100vh - 3.5rem);
+    user-select: none;
+  }
+  
+  #components-layout-demo-custom-trigger .trigger {
+    font-size: 18px;
+    line-height: 64px;
+    padding: 0 24px;
+    cursor: pointer;
+    transition: color 0.3s;
+  }
+  
+  #components-layout-demo-custom-trigger .trigger:hover {
+    color: #1890ff;
+  }
+  
+  #components-layout-demo-custom-trigger .logo {
+    height: 32px;
+    background: rgba(255, 255, 255, 0.3);
+    margin: 16px;
+  }
+  
+  .site-layout .site-layout-background {
+    background: #fff;
+  }
+  
+  :global(.menu .ant-divider-horizontal ){
+    width: 60%;
+    min-width: 76%;
+    margin: 0 auto;
+  }
+  </style>
+    

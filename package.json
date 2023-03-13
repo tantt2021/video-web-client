@@ -1,0 +1,19 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "devDependencies": {
+    "nuxt": "3.0.0"
+  },
+  "dependencies": {
+    "ant-design-vue": "^3.2.15",
+    "less-loader": "^5.0.0",
+    "sass": "^1.26.5",
+    "sass-loader": "^8.0.2"
+  }
+}

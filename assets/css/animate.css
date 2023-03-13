@@ -1,0 +1,5 @@
+@keyframes linkHover {
+    50%{
+        transform: translateY(-.5rem);
+    }
+}
