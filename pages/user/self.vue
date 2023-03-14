@@ -5,74 +5,83 @@
         class="avatar"
         @mouseenter="changeAvatar = true"
         @mouseleave="changeAvatar = false"
-        @click="dialog='更换头像'"
+        @click="dialog = '更换头像'"
       >
         <img src="../../assets/img/yatou.png" alt="" />
         <div class="avatar-mask" v-show="changeAvatar">更换头像</div>
       </div>
       <div class="description">
-        <h3>{{ uname }}</h3>
-        <input v-model="description" maxlength="15" />
+        <h3>{{ user.username }}</h3>
+        <input v-model="user.description" maxlength="15" />
       </div>
       <ul class="data">
         <li>
           <strong>点赞数</strong>
-          {{ publicData.thumbsUp }}
+          {{ user.likeCount }}
         </li>
         <li>
           <strong>播放量</strong>
-          {{ publicData.views }}
+          {{ user.views }}
         </li>
       </ul>
-      <button @click="dialog='修改资料'">修改资料</button>
+      <button @click="dialog = '修改资料'">修改资料</button>
     </div>
-    
+
     <main>
       <nav>
-
         <ul class="nav-list">
-          <li :key="idx" v-for="(item, idx) in tabArr" @click="active=idx" :class="{'active':active===idx}">{{ item }}</li>
+          <li
+            :key="idx"
+            v-for="(item, idx) in tabArr"
+            @click="active = idx"
+            :class="{ active: active === idx }"
+          >
+            {{ item }}
+          </li>
         </ul>
         <ul class="data-list">
-          <li @click="active=3" :class="{'active':active===3}">关注数 {{ publicData.follow }}</li>
-          <li @click="active=4" :class="{'active':active===4}">粉丝量 {{ publicData.fans }}</li>
+          <li @click="active = 3" :class="{ active: active === 3 }">
+            关注数 {{ user.views }}
+          </li>
+          <li @click="active = 4" :class="{ active: active === 4 }">
+            粉丝量 {{ user.views }}
+          </li>
         </ul>
       </nav>
       <article>
         <div v-if="active === 1">
-            <action-item/>
-            <action-item>
-              <action-video-item />
-            </action-item >
-            <action-item>
-            </action-item>
-          </div>
-          <div v-else-if="active === 3">
-            <user-list :userList="upList"></user-list>
-          </div>
-          <div v-else-if="active === 4">
-            <user-list :userList="followers"></user-list>
-          </div>
-          <div v-else class="list">
-            <video-item v-for="item in 9" :key="item" />
-          </div>
+          <action-item />
+          <action-item>
+            <action-video-item />
+          </action-item>
+          <action-item></action-item>
+        </div>
+        <div v-else-if="active === 3">
+          <user-list :userList="upList"></user-list>
+        </div>
+        <div v-else-if="active === 4">
+          <user-list :userList="followers"></user-list>
+        </div>
+        <div v-else class="list">
+          <video-item v-for="item in 9" :key="item" />
+        </div>
       </article>
       <!-- <a-tabs v-model:activeKey="activeKey" > -->
 
-        <!-- <a-tab-pane :key="idx" v-for="(item, idx) in tabArr" :tab="item"> -->
-          <!-- 作品和收藏是同个组件，动态是滚动盒子 -->
-          
-        <!-- </a-tab-pane>
+      <!-- <a-tab-pane :key="idx" v-for="(item, idx) in tabArr" :tab="item"> -->
+      <!-- 作品和收藏是同个组件，动态是滚动盒子 -->
+
+      <!-- </a-tab-pane>
         <a-tab-pane key="1" tab="Tab 1" :style="{float:'right'}">Content of Tab Pane 1</a-tab-pane> -->
 
-        <!-- <template #rightExtra>
+      <!-- <template #rightExtra>
           <a-tabs v-model:activeKey="activeKey">
             <a-tab-pane key="1" tab="Tab 1"></a-tab-pane>
             <a-tab-pane key="2" tab="Tab 2"></a-tab-pane>
             <a-tab-pane key="3" tab="Tab 3"></a-tab-pane>
           </a-tabs> -->
 
-          <!-- <ul class="up-fans">
+      <!-- <ul class="up-fans">
             <li  class="user" @click="content='user'">
               <strong>关注数</strong>
               {{ publicData.follow }}
@@ -82,74 +91,74 @@
               {{ publicData.fans }}
             </li>
           </ul> -->
-        <!-- </template> -->
+      <!-- </template> -->
       <!-- </a-tabs> -->
     </main>
     <!-- 编辑信息 -->
     <a-modal
       v-model:visible="modalVisible"
       :title="dialog"
-      @ok="dialog=''"
+      @ok="dialog = ''"
       class="modal"
-      @cancel="dialog=''"
+      @cancel="dialog = ''"
       centered
     >
-    <div class="modal-box">
-      <ul v-if="dialog==='修改资料'">
-        <li>
-          <label for="uname">昵称</label>
-          <a-input v-model:value="uname" placeholder="Basic usage" id="uname" />
-        </li>
-        <li>
-          <label for="description">我的签名</label>
-          <a-textarea
-            v-model:value="description"
-            placeholder="Autosize height with  minimum and maximum number of lines"
-            :auto-size="{ minRows: 2, maxRows: 5 }"
-            :maxlength="25"
-          />
-        </li>
-        <li>
-          <label for="sex">性别</label>
-          <a-radio-group v-model:value="sex" :options="options1" id="sex" />
-        </li>
-        <li>
-          <label for="birth">出生日期</label>
-          <a-date-picker v-model:value="birth" />
-        </li>
-        <!-- <li>
+      <div class="modal-box">
+        <ul v-if="dialog === '修改资料'">
+          <li>
+            <label for="uname">昵称</label>
+            <a-input
+              v-model:value="user.username"
+              placeholder="Basic usage"
+              id="uname"
+            />
+          </li>
+          <li>
+            <label for="description">我的签名</label>
+            <a-textarea
+              v-model:value="user.description"
+              placeholder="Autosize height with  minimum and maximum number of lines"
+              :auto-size="{ minRows: 2, maxRows: 5 }"
+              :maxlength="25"
+            />
+          </li>
+          <li>
+            <label for="sex">性别</label>
+            <a-radio-group
+              v-model:value="user.sex"
+              :options="options1"
+              id="sex"
+            />
+          </li>
+          <li>
+            <label for="birth">出生日期</label>
+            <a-date-picker v-model:value="user.birth" />
+          </li>
+          <!-- <li>
                 <label for="school">所在学校</label>
 
             </li> -->
-      </ul>
-      <a-upload
-        v-else-if="dialog==='更换头像'"
-        v-model:file-list="fileList"
-        name="avatar"
-        list-type="picture-card"
-        class="avatar-uploader"
-        :show-upload-list="false"
-        action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-        :before-upload="beforeUpload"
-        @change="handleAva"
-      >
-        <img v-if="imageUrl" :src="imageUrl" alt="avatar" />
-        <div v-else>
-          <loading-outlined v-if="loading"></loading-outlined>
-          <plus-outlined v-else></plus-outlined>
-          <div class="ant-upload-text">Upload</div>
-        </div>
-      </a-upload>
-      <!-- <a-tabs v-model:listData="listData" v-else-if="dialog==='列表信息'" type="card">
-        <a-tab-pane key="1" tab="关注(12)"><user-list :userList="upList"></user-list> </a-tab-pane>
-        <a-tab-pane key="2" tab="粉丝(0)"><user-list :userList="followers"></user-list></a-tab-pane>
-      </a-tabs> -->
-    </div>
+        </ul>
+        <a-upload
+          v-else-if="dialog === '更换头像'"
+          v-model:file-list="fileList"
+          name="avatar"
+          list-type="picture-card"
+          class="avatar-uploader"
+          :show-upload-list="false"
+          action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+          :before-upload="beforeUpload"
+          @change="handleAva"
+        >
+          <img v-if="imageUrl" :src="imageUrl" alt="avatar" />
+          <div v-else>
+            <loading-outlined v-if="loading"></loading-outlined>
+            <plus-outlined v-else></plus-outlined>
+            <div class="ant-upload-text">Upload</div>
+          </div>
+        </a-upload>
+      </div>
     </a-modal>
-    <!-- 更换头像 -->
-    <!-- <a-modal v-model:visible="AvatarDialogVisible" title="更换头像" @ok="handleAva" class="modal">
-      
-    </a-modal> -->
   </div>
 </template>
 
@@ -160,9 +169,12 @@ import ActionItem from "@/components/ActionItem.vue";
 import ActionVideoItem from "@/components/ActionVideoItem.vue";
 import UserList from "@/components/UserList.vue";
 import dayjs, { Dayjs } from "dayjs";
-import { PlusOutlined,LoadingOutlined } from '@ant-design/icons-vue';
-import type { UploadChangeParam, UploadProps } from 'ant-design-vue';
-import { message } from 'ant-design-vue';
+import { PlusOutlined, LoadingOutlined } from "@ant-design/icons-vue";
+import type { UploadChangeParam, UploadProps } from "ant-design-vue";
+import { message } from "ant-design-vue";
+import useStore from "../../store";
+const { user } = useStore();
+
 let activeKey = ref(0);
 let listData = ref(0);
 // 个人数据
@@ -199,23 +211,23 @@ let changeAvatar = ref(false);
 let fileList = ref([]);
 let loading = ref(false);
 const changeAva = () => {
-  dialog.value = '';
-}
+  dialog.value = "";
+};
 let AvatarDialogVisible = ref(false);
-const imageUrl = ref<string>(''); 
+const imageUrl = ref<string>("");
 const handleAva = () => {
   // alert("更换成功");
   AvatarDialogVisible.value = false;
   loading.value = true;
-}
-const beforeUpload = (file: UploadProps['fileList'][number]) => {
-  const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+};
+const beforeUpload = (file: UploadProps["fileList"][number]) => {
+  const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
   if (!isJpgOrPng) {
-    message.error('You can only upload JPG file!');
+    message.error("You can only upload JPG file!");
   }
   const isLt2M = file.size / 1024 / 1024 < 2;
   if (!isLt2M) {
-    message.error('Image must smaller than 2MB!');
+    message.error("Image must smaller than 2MB!");
   }
   return isJpgOrPng && isLt2M;
 };
@@ -225,18 +237,18 @@ let dataDetailVisible = ref(false);
 
 let dialog = ref("");
 let modalVisible = computed(() => {
-  if (dialog.value === "修改资料" || dialog.value === "更换头像" ) {
+  if (dialog.value === "修改资料" || dialog.value === "更换头像") {
     return true;
-  } else { 
+  } else {
     return false;
   }
 });
-let upList = ref(['t','a','n','a','a','a','a']);
-let followers = ref(['q','l','y']);
+let upList = ref(["t", "a", "n", "a", "a", "a", "a"]);
+let followers = ref(["q", "l", "y"]);
 
 let active = ref(0);
 // main里面的内容显示
-let content = ref('video');
+let content = ref("video");
 </script>
 <style lang="scss" scoped>
 .messge {
@@ -251,8 +263,8 @@ let content = ref('video');
     }
     .avatar-mask {
       position: absolute;
-      text-align:center;
-      font-size:.5rem;
+      text-align: center;
+      font-size: 0.5rem;
       line-height: 4rem;
       top: 0;
       left: 0;
@@ -300,7 +312,6 @@ let content = ref('video');
         color: rgb(59, 150, 91);
       }
     }
-    
   }
   button {
     margin-top: 1rem;
@@ -324,36 +335,35 @@ main {
   //     cursor: pointer;
   //   }
   // }
-  nav{
-    display:flex;
-    .nav-list{
+  nav {
+    display: flex;
+    .nav-list {
       display: flex;
-      flex-grow:1;
+      flex-grow: 1;
       margin-bottom: 0;
-      li{
+      li {
         margin-left: 2rem;
         line-height: 3rem;
       }
     }
-    .data-list{
+    .data-list {
       display: flex;
       margin-bottom: 0;
 
-      li{
-        margin-right:3rem;
+      li {
+        margin-right: 3rem;
         line-height: 3rem;
-
       }
     }
-    .active{
+    .active {
       color: #44bc87;
     }
   }
-  article{
-      .list {
-        display: flex;
-        flex-wrap: wrap;
-      }
+  article {
+    .list {
+      display: flex;
+      flex-wrap: wrap;
+    }
   }
 }
 .modal {
@@ -373,7 +383,6 @@ main {
       width: 80%;
     }
   }
-  
 }
 :global(.modal span) {
   // line-height:100%;

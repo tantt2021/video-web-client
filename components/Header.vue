@@ -8,7 +8,7 @@
       <button class="audio" @click="audioSearch"><audio-outlined /></button>
     </div>
 
-    <div v-if="!loginVisible" class="right-entry">
+    <div v-if="hasLogin" class="right-entry">
       <NuxtLink to="/message">
         <mail-two-tone two-tone-color="#44bc87" />
         消息
@@ -26,9 +26,31 @@
         创作中心
       </NuxtLink>
       <NuxtLink to="/user/self">
-        <!-- <a-avatar :src="avatar" />  -->
-        <img src="../assets/img/yatou.png" alt="" :style="{width: '1.5rem',borderRadius:'50%'}">
-        个人空间
+        <a-popover placement="bottom" v-model:visible="userMenuVisible">
+          <template #content>
+            <button @click="logout">退出登录</button>
+          </template>
+          <template #title>
+            <div class="user-flex-data">
+              <div class="user-data">
+                <strong>{{ user.views }}</strong>
+                <p>关注</p>
+              </div>
+              <div class="user-data">
+                <strong>{{ user.views }}</strong>
+                <p>粉丝</p>
+              </div>
+            </div>
+          </template>
+          <div @click="userMenuVisible = !userMenuVisible">
+            <img
+              src="../assets/img/yatou.png"
+              alt=""
+              :style="{ width: '1.5rem', borderRadius: '50%' }"
+            />
+            个人空间
+          </div>
+        </a-popover>
       </NuxtLink>
     </div>
     <div v-else class="right-entry">
@@ -43,7 +65,7 @@
 </template>
 
 <script lang="ts">
-import { ref, provide,onMounted } from "vue";
+import { ref, provide, onMounted } from "vue";
 import {
   SearchOutlined,
   MailTwoTone,
@@ -55,18 +77,17 @@ import {
   AudioOutlined,
 } from "@ant-design/icons-vue";
 import LoginModal from "./LoginModal.vue";
+import { message } from "ant-design-vue";
 </script>
 
 <script setup lang="ts">
-onMounted(() => {
-  // console.log($nuxt.$route.path);
-  
-})
+import useStore from "../store";
+const { user } = useStore();
 
 let keyword = ref<string>("");
 // 搜索
 const search = () => {
-  navigateTo('/search');
+  navigateTo("/search");
 };
 
 // 语音搜索
@@ -82,11 +103,36 @@ const handleOk = (e: MouseEvent) => {
 };
 const login = () => {
   loginVisible.value = true;
-  
-}
+};
+// let hasLogin = computed(() => {
+//   if (user.username !== '') {
+//     return true;
+//   } else {
+//     return false;
+//   }
+// })
 
+let hasLogin = ref(false);
+watch(
+  () => user.username,
+  (n) => {
+    if (n !== "") {
+      hasLogin.value = true;
+    } else {
+      hasLogin.value = false;
+    }
+  },
+  { immediate: true, deep: true }
+);
 provide("loginVisible", loginVisible);
+// 退出登录
+const logout = () => {
+  user.logout();
+  message.success("已退出登录", 2.5);
+};
 
+// 用户个人中心菜单
+const userMenuVisible = ref(false);
 </script>
 
 <style lang="scss" scoped>
@@ -144,5 +190,29 @@ provide("loginVisible", loginVisible);
       border: 0;
     }
   }
+}
+
+:global(.ant-popover-title span) {
+  padding: 0 1rem;
+}
+.user-flex-data {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 1rem;
+  .user-data {
+    strong {
+      color: #44bc87;
+    }
+    p {
+      color: #757575;
+    }
+  }
+}
+p {
+  text-align: center;
+  cursor: pointer;
+}
+:global(.ant-popover-inner-content) {
+  text-align: center;
 }
 </style>

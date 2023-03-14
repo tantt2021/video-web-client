@@ -18,7 +18,6 @@
 </template>
 
 <script lang="ts" setup>
-import {defineProps} from "vue";
 let props = defineProps({
     userList: {
         type: Array,

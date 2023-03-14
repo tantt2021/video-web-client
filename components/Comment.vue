@@ -96,7 +96,6 @@
 </template>
 
 <script>
-import axios from "axios";
 import dayjs from "dayjs";
 import { LikeTwoTone, DislikeOutlined } from '@ant-design/icons-vue';
 

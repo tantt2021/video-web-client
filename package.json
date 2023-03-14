@@ -8,12 +8,19 @@
     "postinstall": "nuxt prepare"
   },
   "devDependencies": {
-    "nuxt": "3.0.0"
+    "babel-plugin-import": "^1.13.6",
+    "nuxt": "3.0.0",
+    "unplugin-vue-components": "^0.24.1"
   },
   "dependencies": {
+    "@pinia-plugin-persistedstate/nuxt": "^1.0.0",
+    "@pinia/nuxt": "^0.4.7",
     "ant-design-vue": "^3.2.15",
+    "less": "^3.13.1",
     "less-loader": "^5.0.0",
+    "pinia": "^2.0.33",
     "sass": "^1.26.5",
-    "sass-loader": "^8.0.2"
+    "sass-loader": "^8.0.2",
+    "unplugin-icons": "^0.15.3"
   }
 }

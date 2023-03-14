@@ -9,7 +9,6 @@
     <a-drawer
       v-model:visible="videoCollectionVisible"
       class="custom-class"
-      style="color: red"
       title="视频分P"
       placement="left"
       @after-visible-change="afterVisibleChange"
@@ -27,7 +26,6 @@
     <a-drawer
       v-model:visible="plotModuleVisible"
       class="custom-class"
-      style="color: red"
       title="剧情模块"
       placement="right"
       @after-visible-change="afterplotModuleVisibleChange"
