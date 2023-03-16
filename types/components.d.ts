@@ -39,6 +39,7 @@ declare module '@vue/runtime-core' {
     AUpload: typeof import('ant-design-vue/es')['Upload']
     AUploadDragger: typeof import('ant-design-vue/es')['UploadDragger']
     DislikeOutlined: typeof import('@ant-design/icons-vue')['DislikeOutlined']
+    DownOutlined: typeof import('@ant-design/icons-vue')['DownOutlined']
     LikeTwoTone: typeof import('@ant-design/icons-vue')['LikeTwoTone']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

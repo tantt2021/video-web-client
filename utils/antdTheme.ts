@@ -3,7 +3,7 @@ export const antdTheme = () => {
     // tw primary 500
     "primary-color": "#44bc87",
     // tw title 700
-    "btn-primary-color": "#44bc87",
+    "btn-primary-color": "#fff",
     "border-radius-base": "4px",
     // tw primary 500
     "link-color": "#006528",

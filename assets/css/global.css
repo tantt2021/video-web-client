@@ -65,7 +65,9 @@ input {
 }
 
 body {
-  background-color: var(--color-body-bg);
+  background-color: #ddd;
+  /* background-color: var(--color-body-bg); */
+  
 }
 
 html {

@@ -21,10 +21,26 @@
         <clock-circle-two-tone two-tone-color="#44bc87"/>
         历史记录
       </NuxtLink> -->
-      <NuxtLink to="/platform">
-        <alert-two-tone two-tone-color="#44bc87" />
+      <!-- <NuxtLink to="/platform">
+        
         创作中心
-      </NuxtLink>
+      </NuxtLink> -->
+      <a-dropdown>
+        <NuxtLink class="ant-dropdown-link" @click.prevent>
+          <alert-two-tone two-tone-color="#44bc87" />
+          创作中心
+        </NuxtLink>
+        <template #overlay>
+          <a-menu>
+            <a-menu-item>
+              <nuxt-link to="/platform">视频投稿</nuxt-link>
+            </a-menu-item>
+            <a-menu-item>
+              <nuxt-link to="/studio">互动视频创作</nuxt-link>
+            </a-menu-item>
+          </a-menu>
+        </template>
+      </a-dropdown>
       <NuxtLink to="/user/self">
         <a-popover placement="bottom" v-model:visible="userMenuVisible">
           <template #content>
