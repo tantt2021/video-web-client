@@ -1,6 +1,6 @@
 <template>
   <a-modal
-    v-model:visible="newValue"
+    v-model:visible="visible"
     width="500px"
     title="登录"
     @ok="handleOk"
@@ -26,9 +26,11 @@
         <a-input
           prefix="账号"
           v-model:value="userName"
-          placeholder="请输入账号"
+          placeholder="请输入邮箱"
           autocomplete="on"
           size="large"
+          type="email"
+          required
         />
         <a-input-password
           prefix="密码"
@@ -36,16 +38,16 @@
           placeholder="请输入密码"
           autocomplete="on"
           size="large"
+          type="password"
+          required
         />
-        <br />
-        <!-- <button class="regiAndlogin" @click="register">注册</button> -->
-        <!-- <button class="regiAndlogin" @click="login">登录</button> -->
         <input
           type="button"
           class="regiAndlogin"
           @click="register"
           autocomplete="off"
           value="注册"
+          :disabled="!validated"
         />
         <input
           type="button"
@@ -53,6 +55,7 @@
           @click="login"
           autocomplete="off"
           value="登录"
+          :disabled="!validated"
         />
       </form>
       <template v-else>
@@ -61,17 +64,26 @@
           placeholder="请输入邮箱"
           @search="getVerificationCode"
           size="large"
+          type="email"
+          required
         >
           <template #enterButton>
-            <a-button>{{ "获取验证码" }}</a-button>
+            <a-button :disabled="oneMinute" style="width: 10rem">
+              {{ getCode }}
+            </a-button>
           </template>
         </a-input-search>
-        <a-input
+        <a-input-number
+          required
           prefix="验证码"
-          size="large"
           v-model:value="verificationCode"
+          id="inputNumber"
+          size="large"
+          :controls="false"
         />
-        <button class="regiAndlogin" @click="submit">登录/注册</button>
+        <button class="regiAndlogin" @click="submit" :disabled="codeValidate">
+          登录/注册
+        </button>
       </template>
     </div>
   </a-modal>
@@ -81,8 +93,10 @@
 import { ref, inject } from "vue";
 import type { Ref } from "vue";
 import { message } from "ant-design-vue";
+import { isNull, check, CHECK } from "@/utils/validate";
 
 import useStore from "../store";
+import { LockFilled } from "@ant-design/icons-vue";
 const { user } = useStore();
 
 const emit = defineEmits(["update:value"]);
@@ -103,43 +117,43 @@ const change = (val: string) => {
 let userName = ref<string>("");
 let password = ref<string>("");
 let email = ref<string>("");
-let verificationCode = ref<string>("");
-// 获取验证码
-const getVerificationCode = () => {};
-let newValue = inject("loginVisible");
+let verificationCode = ref<string>();
+
+let visible = inject("loginVisible");
 const handleOk = () => {
-  newValue.value = false;
+  visible.value = false;
   emit("update:value", false);
 };
 
 // 注册
 const register = async () => {
-  if (isNull()) return;
+  if (!validate()) return;
   let res = await user.register({
-    username: userName.value,
+    userName: userName.value,
     password: password.value,
   });
-  if (res.data) {
-    message.success("成为萌新", 2.5);
-    newValue.value = false;
-    emit("update:value", false);
-    userName.value = "";
-    password.value = "";
+  console.log("register", res);
+  if (res.data.msg === "用户已经存在") {
+    message.warn(res.data.msg);
   } else {
-    message.error("成为萌新失败", 2.5);
+    message.success("成为萌新", 2.5);
+    visible.value = false;
+    emit("update:value", false);
+    // userName.value = "";
+    // password.value = "";
   }
 };
 
 // 登录
 const login = async () => {
-  if (isNull()) return;
+  if (!validate()) return;
   let res = await user.login({
     username: userName.value,
     password: password.value,
   });
   if (res.data !== null) {
     message.success("成功上岸", 2.5);
-    newValue.value = false;
+    visible.value = false;
     emit("update:value", false);
     userName.value = "";
     password.value = "";
@@ -148,28 +162,78 @@ const login = async () => {
   }
 };
 
-const submit = () => {
-  if (isNull()) return;
-};
+// 验证码
+let getCode = ref("获取验证码");
+let oneMinute = ref(false);
+let correctCode = ref("0000000000");
+const submit = async () => {
+  console.log(verificationCode.value, correctCode.value);
 
-// 判断为空
-const isNull = () => {
-  // 密码验证
-  if (loginWay.value === "pwd") {
-    if (userName.value.trim() === "" || password.value.trim() === "") {
-      message.error("请正确填写！");
-      return true;
-    } else {
-      return false;
+  if (verificationCode.value?.toString() === correctCode.value) {
+    // message.success("验证成功");
+    //
+    let res = await user.loginByEmail({ userName: email.value });
+    console.log(res, "验证码进入");
+    if (res.data instanceof Object) {
+      // 正常注册登录
+      message.success("success");
+      visible.value = false;
+      emit("update:value", false);
     }
   } else {
-    if (email.value.trim() === "" || verificationCode.value.trim() === "") {
-      message.error("请正确填写！");
-      return true;
-    } else {
-      return false;
-    }
+    message.error("验证码错误");
   }
+};
+// 获取验证码
+const getVerificationCode = async () => {
+  if (!CHECK("email", email.value)) {
+    message.warn("请输入正确邮箱");
+    return;
+  }
+  let res = await user.loginByCode({ email: email.value });
+  // console.log(res.data.loginCode, "code");
+  correctCode.value = res.data.loginCode;
+  let oneMin = 60;
+  getCode.value = "60s";
+  oneMinute.value = true;
+  let timer = setInterval(() => {
+    oneMin--;
+    getCode.value = oneMin + "s";
+    if (oneMin <= 0) {
+      clearInterval(timer);
+      oneMinute.value = false;
+      getCode.value = "重新获取验证码";
+    }
+  }, 1000);
+};
+
+let validated = computed(() => {
+  console.log(validate());
+  return validate();
+});
+let codeValidate = computed(() => {
+  console.log(verificationCode.value);
+
+  if (
+    CHECK("email", email.value) === false ||
+    verificationCode.value === null ||
+    verificationCode.value === undefined
+  ) {
+    return true;
+  }
+  return false;
+  // return CHECK("email", email.value) === false && verificationCode.value === "";
+});
+const validate = () => {
+  if (isNull(userName.value.trim(), password.value.trim())) {
+    return false;
+  }
+  let tip1 = CHECK("email", userName.value);
+  let tip2 = CHECK("password", password.value);
+  if (!tip1 || !tip2) {
+    return false;
+  }
+  return true;
 };
 </script>
 
@@ -193,5 +257,14 @@ const isNull = () => {
     border-radius: 0.2rem;
     border: none;
   }
+  input:disabled {
+    background-color: #ddd;
+  }
+  button:disabled {
+    background-color: #ddd;
+  }
+}
+:global(.ant-input-number-affix-wrapper) {
+  width: 28.2rem;
 }
 </style>

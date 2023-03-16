@@ -1,4 +1,4 @@
-import { getRegister, getLogin } from "@/api/login";
+import { getRegister, getLogin,getLoginByCode,getLoginByEmail } from "@/api/login";
 const useUserStore = defineStore('user', () => {
     let username = ref("");
     let password = ref('');
@@ -23,7 +23,11 @@ const useUserStore = defineStore('user', () => {
     }
     async function register(object: any) {
         let res = await getRegister(object);
-        if (res.data !== null) {
+        console.log(res,"userts");
+        
+        if (res.data.msg === '用户已存在') {
+            return res;
+        } else {
             username.value = res.data.uname;
             description.value = res.data.description;
             birth.value = res.data.birth;
@@ -31,8 +35,9 @@ const useUserStore = defineStore('user', () => {
             likeCount.value = res.data.likeCount;
             views.value = res.data.views;
             createTime.value = res.data.createTime;
+            return res;
         }
-        return res;
+        
     }
     function logout() {
         // 清除cookie
@@ -44,7 +49,26 @@ const useUserStore = defineStore('user', () => {
         views.value = 0;
         createTime.value = "";
     }
-    return { username, password, description, sex, likeCount, views, birth, createTime, login, logout, register };
+    async function loginByCode(object:any) {
+        let res = await getLoginByCode(object);
+        return res;
+    }
+    async function loginByEmail(object: object) {
+        let res = await getLoginByEmail(object);
+        if (res.data === null) {
+            return res;
+        } else {
+            username.value = res.data.uname;
+            description.value = res.data.description;
+            birth.value = res.data.birth;
+            sex.value = res.data.sex;
+            likeCount.value = res.data.likeCount;
+            views.value = res.data.views;
+            createTime.value = res.data.createTime;
+            return res;
+        }
+    }
+    return { username, password, description, sex, likeCount, views, birth, createTime, login, logout, register,loginByCode,loginByEmail };
 },
     {
         // 持久化存储

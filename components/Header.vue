@@ -54,7 +54,7 @@
       </NuxtLink>
     </div>
     <div v-else class="right-entry">
-      <button @click="login">
+      <button @click="openLoginModal">
         <robot-outlined />
         登录
       </button>
@@ -101,22 +101,14 @@ const handleOk = (e: MouseEvent) => {
   console.log(e);
   loginVisible.value = false;
 };
-const login = () => {
+const openLoginModal = () => {
   loginVisible.value = true;
 };
-// let hasLogin = computed(() => {
-//   if (user.username !== '') {
-//     return true;
-//   } else {
-//     return false;
-//   }
-// })
-
 let hasLogin = ref(false);
 watch(
   () => user.username,
   (n) => {
-    if (n !== "") {
+    if (n !== "" && n !== undefined) {
       hasLogin.value = true;
     } else {
       hasLogin.value = false;
