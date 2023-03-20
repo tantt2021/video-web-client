@@ -1,17 +1,26 @@
 <template>
   <div class="music">
     music
-    <marque :style="{ top: Math.random() * 10 + '%' }">111</marque>
-    <marque :style="{ top: Math.random() * 10 + '%' }">111</marque>
-    <marque :style="{ top: Math.random() * 10 + '%' }">111</marque>
-    <marque :style="{ top: Math.random() * 10 + '%' }">111</marque>
-    <marque :style="{ top: Math.random() * 10 + '%' }">111</marque>
-    <!-- <marque>222</marque> -->
+    <canvas id="canvas" width="150" height="150"></canvas>
   </div>
 </template>
 
 <script lang="ts" setup>
-import marque from "~~/components/Marque.vue";
+function draw() {
+  var canvas = document.getElementById("canvas");
+  if (canvas.getContext) {
+    var ctx = canvas.getContext("2d");
+
+    ctx.beginPath();
+    ctx.moveTo(75, 50);
+    ctx.lineTo(100, 75);
+    ctx.lineTo(100, 25);
+    ctx.fill();
+  }
+}
+onMounted(() => {
+  draw();
+});
 </script>
 
 <style lang="scss">

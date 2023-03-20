@@ -16,17 +16,17 @@
     </div>
     <div class="nav">
       <ul>
-        <li @click="thumbup">
-          <like-outlined :class="{ thumbup: isThumbup }" />
+        <li @click="thumbup" :class="{ thumbup: isThumbup }">
+          <like-outlined />
           {{ thumbupCount }}
         </li>
         <li @click="showComment">
           <message-outlined />
           22
         </li>
-        <li @click="addStar">
+        <li @click="addStar" :class="{ thumbup: hasStar }">
           <star-outlined />
-          33
+          {{ starCount }}
         </li>
         <li>
           <share-alt-outlined />
@@ -34,7 +34,7 @@
         </li>
       </ul>
       <a-drawer
-        title="Basic Drawer"
+        title="评论"
         placement="right"
         :closable="false"
         :visible="commentVisible"
@@ -130,7 +130,12 @@ const onClose = () => {
   commentVisible.value = false;
 };
 // 添加收藏
-const addStar = () => {};
+let starCount = ref(22);
+let hasStar = ref(false);
+const addStar = () => {
+  hasStar.value = !hasStar.value;
+  hasStar.value ? (starCount.value += 1) : (starCount.value -= 1);
+};
 </script>
 
 <style lang="scss" scoped>
