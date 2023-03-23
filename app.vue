@@ -13,7 +13,8 @@
 
 <style lang="scss" scoped>
 .root {
-  max-width: 2560px;
+  // max-width: 2560px;
+  // min-width: 580px;
   margin: 0 auto;
 }
 </style>

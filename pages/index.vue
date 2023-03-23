@@ -3,6 +3,7 @@
     <div class="scroll">
       <ul @keyup.enter="next" ref="videoList">
         <li v-for="(item, idx) in 9" :key="idx">
+          <div class="pause" v-show="!play"><caret-right-outlined/></div>
           <video
             src="../assets/video/樱花草.mp4"
             :autoplay="false"
@@ -40,9 +41,7 @@
         :visible="commentVisible"
         @close="onClose"
       >
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
+        <comment />
       </a-drawer>
     </div>
   </div>
@@ -56,6 +55,7 @@ import {
   StarOutlined,
 } from "@ant-design/icons-vue";
 import { onMounted, ref } from "vue";
+import Comment from "@/components/Comment";
 
 // 切换下一个视频
 let videoList = ref(null);
@@ -71,12 +71,15 @@ onMounted(() => {
 
 // 按键切视频
 const switchVideo = (e) => {
+  let height = video.value[0].offsetHeight;
+  console.log(height,"height");
+  
   // 方向键上
   if (e.keyCode == 38) {
     if (current.value !== 0) {
       current.value--;
       videoList.value.style.transform = `translateY(-${
-        627.2 * current.value
+        height * current.value
       }px)`;
     }
   } else if (e.keyCode == 40) {
@@ -85,7 +88,7 @@ const switchVideo = (e) => {
       current.value++;
 
       videoList.value.style.transform = `translateY(-${
-        627.2 * current.value
+        height * current.value
       }px)`;
     }
   } else if (e.keyCode == 37) {
@@ -108,9 +111,16 @@ watch(
   }
 );
 let video = ref([]);
+let play = ref(false);
 const controlPlay = () => {
-  if (video.value[current.value].paused) video.value[current.value].play();
-  else video.value[current.value].pause();
+  if (video.value[current.value].paused) {
+    video.value[current.value].play();
+    play.value = true;
+  }else {
+    video.value[current.value].pause();
+    play.value = false;
+
+  }
 };
 
 // 短视频三大操作
@@ -143,6 +153,8 @@ const addStar = () => {
   background-color: #000;
   backdrop-filter: blur(10px);
   height: 100%;
+  width: 100%;
+
   .scroll {
     overflow-y: hidden;
     position: relative;
@@ -158,9 +170,18 @@ const addStar = () => {
         height: 100%;
         // display: block;
         width: 100%;
+        transform: translate(0);
         video {
           width: 100%;
           height: 100%;
+        }
+        .pause{
+          position: fixed;
+          left: 50%;
+          top: 50%;
+          transform:translate(-50%,-50%);
+          font-size: 3rem;
+          color: #fff;
         }
       }
     }
@@ -169,9 +190,11 @@ const addStar = () => {
   .nav {
     position: fixed;
     right: 2rem;
-    top: 37.5%;
+    top: 20%;
+    // top: 16.5%;
+    // transform: translateY(100%);
     color: #fff;
-    font-size: 1.2rem;
+    font-size: 2vw;
     ul {
       li {
         margin-top: 2rem;

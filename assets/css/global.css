@@ -65,14 +65,13 @@ input {
 }
 
 body {
-  background-color: #ddd;
   /* background-color: var(--color-body-bg); */
   
 }
 
 html {
   overflow-y: var(--html-overflow-y);
-  min-width: 768px;
+  min-width: 580px;
   overscroll-behavior: none;
 }
 

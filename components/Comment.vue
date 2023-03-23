@@ -1,24 +1,7 @@
 <template>
   <div class="comment">
-    <!-- 发表评论 -->
-    <!-- <h2>评论</h2> -->
-    <div class="mycomment">
-      <div class="reviewers">
-        <div class="avatar">
-          <img src="../assets/img/yatou.png" alt="avatar" />
-        </div>
-        <a-textarea v-model:value="textarea1" placeholder="畅所欲言~" allow-clear :style="{ width: '90%' }" />
-
-      </div>
-      <button class="functionButton">表情</button>
-      <button class="functionButton">图片</button>
-      <button @click="commit('1级评论')" class="commit">
-        发送
-      </button>
-    </div>
     <!-- 别人的评论 -->
     <div class="commentSection">
-      <h2>{{ menuArea }}</h2>
       <ul>
         <li v-for="(comment, index) in commentList" :key="comment._id" class="independentArea">
           <div class="whole">
@@ -27,6 +10,7 @@
               <img :src="comment.avatar" alt="" @click="navigateTo('/user/self')"/>
             </div>
             <h4>{{ comment.username }}</h4>
+            <p>{{ comment.commentContent }}</p>
             <label>{{ rightTime(comment.commentTime) }}</label>
             <label class="operate-comment">
               <like-two-tone two-tone-color="#44bc87" />
@@ -39,7 +23,6 @@
               回复
             </button>
 
-            <p>{{ comment.commentContent }}</p>
           </div>
           <!-- 评论的评论 -->
           <ul class="sonComment">
@@ -57,8 +40,16 @@
                 </span>
                 {{ sonComment.replyObject }}
               </h4>
+              <p>{{ sonComment.commentContent }}</p>
 
               <label>{{ sonComment.commentTime }}</label>
+              <label class="operate-comment">
+                <like-two-tone two-tone-color="#44bc87" />
+                <em>999</em>
+
+                <dislike-outlined />
+                <em>333</em>
+              </label>
               <!-- <label
                 @click="like(sonComment, index2)"
                 :class="{ active2: sonComment.isLike }"
@@ -68,7 +59,6 @@
               <button @click="(tempNum = index), (replyToName = sonComment.username)" class="reply">
                 回复
               </button>
-              <p>{{ sonComment.commentContent }}</p>
             </li>
           </ul>
 
@@ -78,7 +68,7 @@
               <div class="avatar">
                 <img src="../assets/img/yatou.png" alt="avatar" />
               </div>
-              <a-textarea v-model:value="textarea2" placeholder="畅所欲言~" allow-clear :style="{ width: '32rem' }" />
+              <a-textarea v-model:value="textarea2" placeholder="畅所欲言~" allow-clear :style="{ width: '80%' }" />
 
             </div>
             <button class="functionButton">表情</button>
@@ -132,7 +122,7 @@ export default {
             {
               avatar: new URL('../assets/img/yatou.png', import.meta.url).href,
               username: "tantt",
-              commentTime: "2022",
+              commentTime: "2023.3.22 19:35",
               commentContent: "这是评论1",
               replyObject: "tantt",
             }
@@ -169,11 +159,8 @@ export default {
   computed: {
     rightTime() {
       return function (time) {
-        return dayjs(time).format("YYYY-MM-DD HH:mm:ss");
+        return dayjs(time).format("YYYY-MM-DD HH:mm");
       };
-    },
-    menuArea() {
-      return this.father === "leaveWord" ? "留言板" : "评论区";
     },
     avatar() {
       var temp = "";
@@ -449,14 +436,14 @@ export default {
 }
 
 .avatar {
-  height: 50px;
-  width: 50px;
+  height: 2rem;
+  width: 2rem;
   border-radius: 5px;
   overflow: hidden;
   display: inline-block;
   margin-right: 25px;
   float: left;
-  margin-top: .5rem;
+  margin-right: .5rem;
 }
 
 .avatar img {
@@ -472,10 +459,10 @@ export default {
 .comment {
   width: 100%;
   /* margin: 10px 0 20px 7vw; */
-  margin: 15px 0;
+  // margin: 15px 0;
   /* height: 20%; */
   background-color: #fff;
-  padding: 20px;
+  // padding: 20px;
   /* box-shadow: 0 0 7px 2px #d0d0d0; */
   opacity: 0.9;
   border-radius: 8px;
@@ -508,6 +495,7 @@ export default {
   margin: 10px 10px;
   border: none;
   background-color: transparent;
+  
 }
 
 .functionButton:hover {
@@ -528,14 +516,12 @@ export default {
 }
 
 .mycomment {
-  border: 1px solid #ddd;
   border-radius: 8px;
   padding: 10px;
   margin: 10px;
 }
 
 .commentSection {
-  margin: 40px 0;
 }
 
 .commentSection ul {
@@ -544,7 +530,7 @@ export default {
 }
 
 .independentArea {
-  border-top: 1px solid #ddd;
+  // border-top: 1px solid #ddd;
   animation: move3 0.5s;
 
   p {
@@ -578,8 +564,9 @@ h4 {
 }
 
 .commentSection p {
-  margin: 15px 0;
-  padding-left: 75px;
+  // margin: 15px 0;
+  padding-left: 2.5rem;
+  margin: 0;
 }
 
 /* .active2 {
@@ -591,6 +578,13 @@ h4 {
   /* background-color: #ddd; */
   border-left: 5px solid #ddd;
   padding: 15px 0;
+  .operate-comment {
+    margin-left: 1rem;
+    white-space: nowrap;
+    span~span {
+      margin-left: 1rem;
+    }
+  }
 }
 
 .sonComment li {
@@ -598,11 +592,11 @@ h4 {
 }
 
 .whole {
-  margin: 10px 0;
+  margin: 1rem 0;
 
   .operate-comment {
     margin-left: 1rem;
-
+    white-space: nowrap;
     span~span {
       margin-left: 1rem;
     }
@@ -613,7 +607,7 @@ h4 {
   .comment {
     width: 100%;
     text-align: left;
-    margin: 20px auto;
+    // margin: 20px auto;
   }
 }
 </style>

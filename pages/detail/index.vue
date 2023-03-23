@@ -17,6 +17,7 @@
         @mouseleave="controlsVisible = false"
         ref="videoBox"
       >
+      <div class="pause" v-show="!play"><caret-right-outlined/></div>
         <!-- v-show="controlsVisible"  -->
         <div class="marque-box">
           <div
@@ -85,6 +86,21 @@
         <a-tag>Tag 1</a-tag>
       </div>
       <!-- 评论 -->
+      <h3>评论区</h3>
+      <div class="mycomment">
+        <div class="reviewers">
+          <div class="avatar">
+            <img src="../../assets/img/yatou.png" alt="avatar" />
+          </div>
+          <a-textarea v-model:value="textarea1" placeholder="畅所欲言~" allow-clear :style="{ width: '90%' }" />
+
+        </div>
+        <button class="functionButton">表情</button>
+        <button class="functionButton">图片</button>
+        <button @click="commit('1级评论')" class="functionButton">
+          发送
+        </button>
+      </div>
       <comment />
     </div>
     <div class="right-container">
@@ -107,12 +123,12 @@
       </div>
       <div class="recommend-list">
         <span>更多视频</span>
-        <video-card />
-        <video-card />
-        <video-card />
-        <video-card />
-        <video-card />
-        <video-card />
+        <video-card :width="10"/>
+        <video-card :width="10"/>
+        <video-card :width="10"/>
+        <video-card :width="10"/>
+        <video-card :width="10"/>
+        <video-card :width="10"/>
       </div>
     </div>
   </div>
@@ -125,11 +141,12 @@ import {
   StarTwoTone,
   ShareAltOutlined,
   WarningOutlined,
+  CaretRightOutlined,
 } from "@ant-design/icons-vue";
 import comment from "@/components/Comment.vue";
 import VideoCard from "@/components/VideoCard.vue";
 import Controls from "@/components/Controls.vue";
-import { formatTime } from "@/utils/index.ts";
+import { formatTime } from "@/utils/index";
 import Marque from "@/components/Marque.vue";
 let title = ref("title");
 
@@ -159,8 +176,9 @@ const handlePlay = (e: boolean) => {
 };
 const resetInterval = () => {
   timer = setInterval(() => {
-    currentTime.value = formatTime(video.value.currentTime);
-  }, 500);
+    // currentTime.value = formatTime(video.value.currentTime);
+    currentTime.value = video.value.currentTime;
+  }, 50);
 };
 
 // 全屏
@@ -193,16 +211,16 @@ const handleScreen = (e: boolean) => {
 };
 
 // 定时器定时访问播放时长
-let currentTime = ref("00 : 00");
+let currentTime = ref(0);
 let timer;
 
 // 视频时长
-let duration = ref("0");
+let duration = ref(0);
 
 // 进度条点击
 const handleChangeslider = (e: number) => {
   // e就是currentTime
-  currentTime.value = formatTime(e);
+  currentTime.value = e;
   video.value.currentTime = e;
 };
 
@@ -236,13 +254,13 @@ onMounted(() => {
   console.log(document);
 
   // 格式化视频时长
-  duration.value = formatTime(video.value.duration);
+  duration.value = video.value.duration;
   // 循环播放
   video.value.onended = () => {
     play.value = false;
     handlePlay(autoloop.value);
   };
-  // webkit
+  // webkit 监听全屏
   document.addEventListener("webkitfullscreenchange", () => {
     const isFullScreen =
       document.fullScreen ||
@@ -326,15 +344,22 @@ watch(
 
 // 发送弹幕
 const submitMarque = () => {};
+
+// 评论内容
+let  textarea1 = ref("");
 </script>
 
 <style lang="scss" scoped>
 .video-detail {
   display: flex;
   .left-container {
-    width: 58rem;
+    width: 63rem;
+    h1{
+      margin: 0 1rem;
+    }
     .video-data {
-      margin-bottom: 1rem;
+      margin: .5rem 1rem; 
+
       font-size: 0.8rem;
 
       img {
@@ -356,6 +381,14 @@ const submitMarque = () => {};
         width: 100%;
         height: 100%;
       }
+      .pause{
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform:translate(-50%,-50%);
+        font-size: 3rem;
+        color: #fff;
+      }
     }
     .marque-box {
       position: absolute;
@@ -369,23 +402,35 @@ const submitMarque = () => {};
     .interaction {
       display: flex;
       justify-content: space-between;
+      padding: 0 .5rem 0 1rem;
+      padding-bottom: .5rem;
+      box-shadow: 0px .5rem 1rem 1px #ddd;
     }
     .operate {
       display: flex;
       justify-content: space-between;
       line-height: 3rem;
       border-bottom: 1px solid #ddd;
+      padding-left: 1rem;
+
       span ~ span {
         margin-left: 3rem;
       }
+      
       .complain {
         // float: right;
       }
     }
+    h3{
+        margin: 0 1rem;
+      }
+    .tag-list{
+      margin: 1rem .5rem;
+    }
   }
 
   .right-container {
-    width: 25rem;
+    width: 20rem;
     height: 50rem;
     margin-left: 2rem;
     .up-info {
@@ -420,6 +465,44 @@ const submitMarque = () => {};
   span {
     font-weight: 400;
   }
+}
+.mycomment {
+  // border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  margin: 10px;
+  .reviewers {
+    margin-bottom: 15px;
+    margin-left: 15px;
+    margin-top: 5px;
+  }
+  .avatar{
+    height: 50px;
+    width: 50px;
+    border-radius: 5px;
+    overflow: hidden;
+    display: inline-block;
+    margin-right: 1rem;
+    float: left;  
+    // margin-top: .5rem;
+    img{
+      width: 100%;
+      height: 100%;
+    }
+  }
+  .functionButton {
+    margin: 10px 10px;
+    border: none;
+    background-color: transparent;
+    &:hover{
+      color: skyblue;
+      cursor: pointer;
+    }
+    &:nth-child(4){
+      float: right;
+    }
+  }
+
 }
 
 //所有控件

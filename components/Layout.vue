@@ -1,19 +1,13 @@
 <template>
     <a-layout class="layout">
       <a-layout-sider v-model:collapsed="collapsed" :trigger="null" collapsible >
-        <div class="logo" />
-        <a-menu v-model:selectedKeys="selectedKeys" theme="light" mode="inline" :style="{height:'calc(100vh - 3.5rem)'}" class="menu">
+        <a-menu v-model:selectedKeys="selectedKeys" theme="light" mode="inline"  class="menu">
           <a-menu-item key="1" @click="navigateTo('/')">
               <like-outlined />
               <span>推荐</span>
           </a-menu-item>
           <a-menu-item key="2" @click="navigateTo('/discover')">
               <user-outlined/>
-              <!-- <slot v-html=""></slot> -->
-              <!-- <span v-slot="<user-outlined/>"></span> -->
-              <!-- <span v-html=""></span> -->
-              <!-- <icon-font type="icon-useroutlined" /> -->
-              <!-- <icon-font type="icon-tuichu" /> -->
               <span>首页</span>
           </a-menu-item>
           
@@ -50,7 +44,7 @@
           <menu-unfold-outlined v-if="collapsed" class="trigger" @click="() => (collapsed = !collapsed)" />
           <menu-fold-outlined v-else class="trigger" @click="() => (collapsed = !collapsed)" />
         </a-layout-header>
-        <a-layout-content :style="{ padding: '0 0px', background: '#fff', minHeight: '280px' }">
+        <a-layout-content :style="{ padding: '0 0px', background: '#fff', minHeight: '280px',overflowY:'scroll' }" class="layout-content">
           <nuxt-page></nuxt-page>
           <!-- <nuxt /> -->
         </a-layout-content>
@@ -109,6 +103,17 @@
       behavior:'smooth',
     });
   }
+  const resize = ()=>{
+      console.log(window,'win');
+      if(window.innerWidth < 1000){
+        collapsed.value = true;
+      }else{
+        collapsed.value = false;
+
+      }
+      
+    };
+
   let show = ref(false);
   onMounted(() => {
     window.addEventListener("scroll", () => {
@@ -118,11 +123,13 @@
       } else {
         show.value = false;
       }
-    })
-  });
+    });
+    resize();
+    window.addEventListener("resize",resize);
+  // });÷
       // };
     // },
-  // });
+  });
   </script>
   <style scoped>
   .toTop{
@@ -135,6 +142,13 @@
   .layout {
     height: calc(100vh - 3.5rem);
     user-select: none;
+    width: 100%;
+  }
+  .menu{
+    height: 100%;
+  }
+  .layout-content{
+    width: 100%;
   }
   
   #components-layout-demo-custom-trigger .trigger {

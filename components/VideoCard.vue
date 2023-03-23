@@ -1,7 +1,7 @@
 <template>
     <div class="video-card" @click="navigateTo('/detail')">
         <div class="video-card-cover">
-            <img src="../assets/img/侧耳.jpg" alt="">
+            <img src="../assets/img/侧耳.jpg" alt="" :width="16*width">
         </div>
         <div class="video-card-info">
             <h2>title</h2>
@@ -17,6 +17,12 @@
 </template>
 
 <script lang="ts" setup>
+let props = defineProps({
+    width:{
+        type:Number,
+        default:15
+    }
+})
 </script>
 
 <style lang="scss" scoped>
@@ -31,7 +37,7 @@
     }
     .video-card-cover{
         img{
-            width:15rem;
+            // width:15rem;
         }
     }
     .video-card-info{
@@ -51,6 +57,7 @@
             }
         }
         .data{
+            white-space: nowrap;
             img{
                 vertical-align: text-bottom;
                 & ~ img{

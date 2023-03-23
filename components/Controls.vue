@@ -8,6 +8,8 @@
           :disabled="sliderDisabled" 
           @change="sliderChange"
           :tip-formatter="formatter"
+          :max="duration"
+          :step="0.001"
         />
     </div>
 
@@ -17,7 +19,7 @@
           <caret-right-outlined v-if="!play"/>
           <pause-outlined v-else/>
       </span>
-      <span>{{currentTime}} / {{ duration }}</span>
+      <span>{{formatTime(currentTime)}} / {{ formatTime(duration) }}</span>
       </div>
       <div class="send-marquee" v-show="fullScreen">
         <span @click="MarqueeVisible=!MarqueeVisible">
@@ -109,16 +111,16 @@ const emit = defineEmits([
   "changeAutoloop",
   "changeVolume",
 ]);
-import {formatTime} from "@/utils/index.ts";
+import {formatTime} from "@/utils/index";
 
 const props = defineProps({
   duration: {
-    type: String,
-    default:"00:00",
+    type: Number,
+    default:0,
   },
   currentTime:{
-    type:String,
-    default:"00:00",
+    type:Number,
+    default:0,
   },
   play:{
     type:Boolean,
@@ -135,27 +137,37 @@ onMounted(()=>{
 
 });
 // 进度条
-let sliderValue = ref(0);
+let sliderValue = ref((props.currentTime));
 // 进度条提示
 let formatter = (value: number) => {
-  return formatTime(value*NumberDuration.value/100);
+  return formatTime(props.currentTime);
 };
 // 监听播放时长，改变进度条
 let NumberDuration = ref(0);
 watch(()=>props.currentTime,()=>{
-    let minArr = props.duration.split(":");
-    NumberDuration.value = +minArr[0] * 60 + +minArr[1];
-    minArr = props.currentTime.split(":");
-    let cu = +minArr[0] * 60 + +minArr[1];
-    sliderValue.value =  cu / NumberDuration.value * 100;
+    // 视频时长的数字形式 
+    // let minArr = props.duration.split(":");
+    // NumberDuration.value = +minArr[0] * 60 + +minArr[1];
+    // minArr = props.currentTime.split(":");
+    // 视频当前播放时长的数字形式 
+    // let cu = +minArr[0] * 60 + +minArr[1];
+    // 进度条的形式
+    // sliderValue.value =  cu / NumberDuration.value * 1000;
 });
 let sliderDisabled = ref(false);
 // 进度条被拖动
 const sliderChange = (e) => {
   // e/100*NumberDuration.value就是NUmberCurrentTime;
   // 改变currentTime  
-  emit("handleChangeslider",+e/100*+NumberDuration.value);
+  console.log(e,'eeee');
+  
+  sliderValue.value = e;
+  emit("handleChangeslider",+e);
 }
+
+watch(()=>props.currentTime,()=>{
+  sliderValue.value = props.currentTime;
+})
 
 // 播放
 const handlePlay = () => {
@@ -221,7 +233,7 @@ const onSearch = () => {
     width: 100%;
     height: 4rem;
     line-height: 3rem;
-    padding: 0 .8rem 0 .5rem;
+    padding: 0 .8rem;
     z-index:1;
     #test{
           margin:0;

@@ -151,6 +151,7 @@ const userMenuVisible = ref(false);
   height: 3.5rem;
   line-height: 3.5rem;
   .search {
+    flex-shrink: 0;
     input {
       outline: none;
       height: 2rem;
@@ -184,6 +185,8 @@ const userMenuVisible = ref(false);
     }
   }
   .right-entry {
+    flex-shrink: 0;
+
     width: 30rem;
     a {
       // transition: all 0.5s;
