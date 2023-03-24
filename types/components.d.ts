@@ -40,10 +40,10 @@ declare module '@vue/runtime-core' {
     AUploadDragger: typeof import('ant-design-vue/es')['UploadDragger']
     CaretRightOutlined: typeof import('@ant-design/icons-vue')['CaretRightOutlined']
     DislikeOutlined: typeof import('@ant-design/icons-vue')['DislikeOutlined']
-    DownOutlined: typeof import('@ant-design/icons-vue')['DownOutlined']
+    InfoCircleOutlined: typeof import('@ant-design/icons-vue')['InfoCircleOutlined']
     LikeTwoTone: typeof import('@ant-design/icons-vue')['LikeTwoTone']
-    PauseOutlined: typeof import('@ant-design/icons-vue')['PauseOutlined']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    UserOutlined: typeof import('@ant-design/icons-vue')['UserOutlined']
   }
 }

@@ -81,6 +81,9 @@
         </li>
       </ul>
       <h5 style="color: skyblue">已经到底了...</h5>
+      <div class="bottom-submit">
+        <slot></slot>
+      </div>
     </div>
   </div>
 </template>
@@ -113,6 +116,51 @@ export default {
       textarea2: "",
       showEditCommentOthers: false,
       commentList: [
+        {
+          avatar: new URL('../assets/img/yatou.png', import.meta.url).href,
+          username: "tantt",
+          commentTime: "2022",
+          commentContent: "这是评论1",
+          discussList: [
+            {
+              avatar: new URL('../assets/img/yatou.png', import.meta.url).href,
+              username: "tantt",
+              commentTime: "2023.3.22 19:35",
+              commentContent: "这是评论1",
+              replyObject: "tantt",
+            }
+          ]
+        },
+        {
+          avatar: new URL('../assets/img/yatou.png', import.meta.url).href,
+          username: "tantt",
+          commentTime: "2022",
+          commentContent: "这是评论1",
+          discussList: [
+            {
+              avatar: new URL('../assets/img/yatou.png', import.meta.url).href,
+              username: "tantt",
+              commentTime: "2023.3.22 19:35",
+              commentContent: "这是评论1",
+              replyObject: "tantt",
+            }
+          ]
+        },
+        {
+          avatar: new URL('../assets/img/yatou.png', import.meta.url).href,
+          username: "tantt",
+          commentTime: "2022",
+          commentContent: "这是评论1",
+          discussList: [
+            {
+              avatar: new URL('../assets/img/yatou.png', import.meta.url).href,
+              username: "tantt",
+              commentTime: "2023.3.22 19:35",
+              commentContent: "这是评论1",
+              replyObject: "tantt",
+            }
+          ]
+        },
         {
           avatar: new URL('../assets/img/yatou.png', import.meta.url).href,
           username: "tantt",
@@ -461,7 +509,7 @@ export default {
   /* margin: 10px 0 20px 7vw; */
   // margin: 15px 0;
   /* height: 20%; */
-  background-color: #fff;
+  // background-color: #fff;
   // padding: 20px;
   /* box-shadow: 0 0 7px 2px #d0d0d0; */
   opacity: 0.9;
@@ -600,6 +648,18 @@ h4 {
     span~span {
       margin-left: 1rem;
     }
+  }
+}
+.bottom-submit{
+  border-top: 1px solid #000;
+  position: sticky;
+  bottom: 0;
+  padding-bottom: 1rem;
+  padding-top: 1rem;
+  background-color: #fff;
+  overflow: hidden;
+  input{
+    width: 100%;
   }
 }
 

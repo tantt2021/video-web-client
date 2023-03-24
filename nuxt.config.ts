@@ -4,6 +4,14 @@ import { AntDesignVueResolver } from 'unplugin-vue-components/resolvers';
 import { antdTheme } from "./utils/antdTheme";
 import IconsResolver from "unplugin-icons/resolver";
 export default defineNuxtConfig({
+    head: {
+        title: 'My Nuxt App',
+        meta: [
+          { charset: 'utf-8' },
+          { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+          { hid: 'description', name: 'description', content: 'My awesome Nuxt.js app' }
+        ]
+    },
     modules: [
         // '@nuxtjs/style-resources',
 
