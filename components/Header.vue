@@ -17,14 +17,11 @@
         <star-two-tone two-tone-color="#44bc87" />
         收藏
       </NuxtLink>
-      <!-- <NuxtLink to="history">
+      <NuxtLink to="/history">
         <clock-circle-two-tone two-tone-color="#44bc87"/>
         历史记录
-      </NuxtLink> -->
-      <!-- <NuxtLink to="/platform">
-        
-        创作中心
-      </NuxtLink> -->
+      </NuxtLink>
+      <!-- 创作中心 -->
       <a-dropdown>
         <NuxtLink class="ant-dropdown-link" @click.prevent>
           <alert-two-tone two-tone-color="#44bc87" />
@@ -41,6 +38,7 @@
           </a-menu>
         </template>
       </a-dropdown>
+      <!-- 个人中心 -->
       <NuxtLink to="/user/self">
         <a-popover placement="bottom" v-model:visible="userMenuVisible">
           <template #content>
@@ -187,7 +185,7 @@ const userMenuVisible = ref(false);
   .right-entry {
     flex-shrink: 0;
 
-    width: 30rem;
+    // width: 30rem;
     a {
       // transition: all 0.5s;
       display: inline-block;

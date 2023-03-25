@@ -27,7 +27,7 @@ const useUserStore = defineStore('user', () => {
         
         if (res.data.msg === '用户已存在') {
             return res;
-        } else {
+        } else if(res.msg === '请求成功'){
             username.value = res.data.uname;
             description.value = res.data.description;
             birth.value = res.data.birth;

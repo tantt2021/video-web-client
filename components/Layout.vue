@@ -19,10 +19,6 @@
               <crown-outlined />
               <span>动态</span>
           </a-menu-item>
-          <a-menu-item key="5" @click="navigateTo('/history')">
-              <clock-circle-outlined />
-              <span>历史</span>
-          </a-menu-item>
           <!-- 分割线 -->
           <a-divider style="border-color: #44bc87"  />
           <a-menu-item key="6" @click="navigateTo('/music')">

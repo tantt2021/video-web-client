@@ -132,12 +132,8 @@
           </li>
           <li>
             <label for="birth">出生日期</label>
-            <a-date-picker v-model:value="user.birth" />
+            <a-date-picker v-model:value="date" />
           </li>
-          <!-- <li>
-                <label for="school">所在学校</label>
-
-            </li> -->
         </ul>
         <a-upload
           v-else-if="dialog === '更换头像'"
@@ -188,16 +184,19 @@ let publicData = ref({
 let uname = ref("特调酒");
 // 个签
 let description = ref("do you want to build a snowman");
+// 出生日期
+let date= ref();
+watch(()=>date.value,(n)=>{
+  console.log(n);
+  
+})
 
 // tab栏
 let tabArr = ref(["作品", "动态", "收藏"]);
 // 修改用户信息
 const editUserMess = () => {};
 // 修改用户信息显示
-let modal1Visible = ref(false);
-const setModal1Visible = (visible: boolean) => {
-  dialog.value = visible;
-};
+
 // 性别
 let sex = ref("保密");
 let options1 = ref(["男", "女", "保密"]);
@@ -206,17 +205,13 @@ let options1 = ref(["男", "女", "保密"]);
 const dateFormat = "YYYY-MM-DD";
 let birth = ref<Dayjs>(dayjs("2015-06-06", dateFormat));
 
-//头像
+// 头像
 let changeAvatar = ref(false);
 let fileList = ref([]);
 let loading = ref(false);
-const changeAva = () => {
-  dialog.value = "";
-};
 let AvatarDialogVisible = ref(false);
 const imageUrl = ref<string>("");
 const handleAva = () => {
-  // alert("更换成功");
   AvatarDialogVisible.value = false;
   loading.value = true;
 };
@@ -236,11 +231,15 @@ const beforeUpload = (file: UploadProps["fileList"][number]) => {
 let dataDetailVisible = ref(false);
 
 let dialog = ref("");
-let modalVisible = computed(() => {
-  if (dialog.value === "修改资料" || dialog.value === "更换头像") {
-    return true;
+let modalVisible = ref(false);
+watch(()=>dialog.value,(newV) => {
+  console.log(newV,'dialog');
+  
+  if (newV === "修改资料" || newV === "更换头像") {
+    modalVisible.value = true;
+    dialog.value = newV;
   } else {
-    return false;
+    modalVisible.value = false;
   }
 });
 let upList = ref(["t", "a", "n", "a", "a", "a", "a"]);
