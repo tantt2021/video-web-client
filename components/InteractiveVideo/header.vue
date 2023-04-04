@@ -57,7 +57,7 @@ const quitCancel = (e: MouseEvent) => {
 let videoPreview = ref(false);
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .header{
     display: flex;
     justify-content: space-between;
@@ -79,6 +79,8 @@ let videoPreview = ref(false);
         margin-left: 2rem;
         color: #44bc87;
         border: 1px solid #44bc87;
+        height: 2rem;
+        line-height: 100%;
         padding: .2rem 1rem;
     }
 }

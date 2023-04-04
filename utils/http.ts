@@ -55,8 +55,8 @@ export const Http = {
         return fetch(url, { method: 'get', params }, headers)
     },
 
-    post(url: string, params?: any, headers?: any): Promise<any> {
-        return fetch(url, { method: 'post', params }, headers)
+    post(url: string, params?: any, headers?: any,body?:FormData): Promise<any> {
+        return fetch(url, { method: 'post', params,body })
     },
 
     put(url: string, params?: any, headers?: any): Promise<any> {

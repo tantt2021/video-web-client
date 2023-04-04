@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="space">
       <div class="edit">
         <a-textarea v-model:value="textValue" placeholder="Autosize height with minimum and maximum number of lines"
           :auto-size="{ minRows: 2, maxRows: 50 }" />
@@ -53,7 +53,9 @@
             视频
           </a-menu-item>
         </a-menu>
-        <nuxt-page></nuxt-page>
+        <suspense>
+          <nuxt-page></nuxt-page>
+        </suspense>
       </div>
     </div>
   </template>
@@ -69,6 +71,12 @@
     MailOutlined,
     
   } from '@ant-design/icons-vue';
+  useHead({
+  title: '动态',
+  meta: [
+    { name: 'description', content: 'My amazing site.' }
+  ],
+})
   
   // 动态文字
   let textValue = ref("");
@@ -78,48 +86,53 @@
 
   const router = useRouter();;
   router.push('/space/all');
+
   </script>
   
   <style lang="scss" scoped>
-  .edit{
-    padding: 0 1rem;
-  }
-  .plugin {
-    display: flex;
-    justify-content: space-between;
-    margin-top: .5rem;
-    padding: 0 1rem;
-  
-    .left {
-      span~span {
-        margin-left: 1rem;
-  
-      }
+  .space{
+    padding: 1rem 0;
+    .edit{
+      padding: 0 1rem;
     }
-  
-    .right {
-  
-      // float:right;
-      button {
-        line-height: 100%;
+    .plugin {
+      display: flex;
+      justify-content: space-between;
+      margin-top: .5rem;
+      padding: 0 1rem;
+    
+      .left {
+        span~span {
+          margin-left: 1rem;
+        
+        }
       }
-  
-      .submit {
-        margin-left: 2rem;
+    
+      .right {
+      
+        // float:right;
+        button {
+          line-height: 100%;
+        }
+      
+        .submit {
+          margin-left: 2rem;
+        }
       }
+    
     }
-  
+    p{
+      text-align: center;
+      background-color: #b0dda7;
+      font-weight: 400;
+      padding: .3rem 0;
+      margin: .5rem 0;
+    }
+    a {
+      font-weight: 400;
+      font-size: .8rem;
+    
+    }
   }
-  p{
-    text-align: center;
-    background-color: #b0dda7;
-    font-weight: 400;
-    padding: .3rem 0;
-    margin: .5rem 0;
-  }
-  a {
-    font-weight: 400;
-    font-size: .8rem;
-  
-  }
+
   </style>

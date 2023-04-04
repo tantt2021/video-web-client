@@ -18,6 +18,12 @@
 
 <script lang="ts" setup>
 import {ref} from "vue";
+useHead({
+  title: '搜索',
+  meta: [
+    { name: 'description', content: 'My amazing site.' }
+  ],
+})
 let keyword = ref("");
 const onSearch = () => {
 

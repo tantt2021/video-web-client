@@ -1,29 +1,45 @@
 <template>
-    <!-- <div v-for="(item,idx) in userList" :key="idx">
-        
-    </div> -->
-
-    
-    <div class="user-list" v-for="(item,idx) in userList" :key="idx">
-        <img src="../assets/img/yatou.png" alt="">
+    <a-empty v-if="userList.length===0"/>
+    <div class="user-list" v-for="(item,idx) in userList" :key="idx" v-else>
+        <img :src="item.avatar" alt="">
         <div class="user-info">
-            <strong>name</strong>
-            <p>description</p>
+            <nuxt-link :to="`/user/${item.id}`">{{ item.uname }}</nuxt-link>
+            <p>{{item.description}}</p>
         </div>
         <div class="user-operate">
-            <a-button type="primary">关注</a-button>
+            <a-button 
+                :style="{backgroundColor:isFollow?'#fff':'#44bc87'}"  
+                @click="handleFollow(item.id)"
+                ref="followButton"
+            >
+                {{ isFollow?'已关注':'关注' }}
+            </a-button>
         </div>
     </div>
 
 </template>
 
 <script lang="ts" setup>
+import type {PublicUserType} from "@/types";
+
 let props = defineProps({
     userList: {
-        type: Array,
+        type: Array<PublicUserType>,
         default:[]
     }
 });
+let isFollow = ref(true);
+let followButton = ref(null);
+onMounted(()=>{
+    // console.log(followButton,'mounted');
+    
+})
+const handleFollow = (id:string) => {
+    // followButton.value[idx].
+    console.log(id);
+    // 删除userId为user.id的，followId为id的follow表数据
+    // isFollow.value = !isFollow.value;
+}
 </script>
 
 <style lang="scss" scoped>
@@ -38,9 +54,11 @@ let props = defineProps({
     }
     .user-info{
         flex: 1;
-        strong{
+        a{
             font-size: 1.2rem;
-
+            &:hover{
+                color: #44bc87;
+            }
         }
         p{
             color:#777;

@@ -71,7 +71,12 @@
 import Header from "@/components/InteractiveVideo/header.vue";
 import {DownOutlined,RightOutlined} from "@ant-design/icons-vue";
 import {computed} from "vue";
-
+useHead({
+  title: '创作中心/互动视频创作',
+  meta: [
+    { name: 'description', content: 'My amazing site.' }
+  ],
+})
 const videoCollectionVisible = ref<boolean>(false);
 
 const afterVisibleChange = (bool: boolean) => {
@@ -103,7 +108,7 @@ let filterVideoList = computed(()=>{
 
 <style lang="scss" scoped>
 .interactive-video{
-    background: #d5ffec;
+    background: #b4e0df;
     background-image:
         linear-gradient(rgba(138, 138, 138, 0.1) 1px, transparent 0),
         linear-gradient(90deg, rgba(138, 138, 138, 0.1) 1px, transparent 0);

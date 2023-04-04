@@ -1,12 +1,9 @@
 <template>
   <div class="message">
     <a-tabs v-model:activeKey="activeKey" >
-      <a-tab-pane :tab="item" v-for="(item,idx) in nav" :key="idx" :style="{width: 'calc(100vw -  224px)'}">
-        <!-- {{idx}} -->
+      <a-tab-pane :tab="item" v-for="(item,idx) in nav" :key="idx">
         <component :is="otherNav[activeKey]"></component>
       </a-tab-pane>
-    
-      
     </a-tabs>
     
 </div>
@@ -34,7 +31,12 @@ export default {
 
 
 <script lang="ts" setup>
-
+useHead({
+  title: '消息',
+  meta: [
+    { name: 'description', content: 'My amazing site.' }
+  ],
+})
 let activeKey = ref(0);
 
 let current = ref("");
@@ -51,14 +53,14 @@ let otherNav = ['SystemNotification','AnswerMe','Qme','Chat','LikeView','MessSet
 <style lang="scss" scoped>
 .message{
   display:flex;
-  width: calc(100vw - 200px);
+  width: 100%;
   height: 100%;
 }
 
 
 :global(.message .ant-tabs-content-top,.message .ant-tabs-content){
   height: 100%;
-        overflow: scroll;
+        // overflow: scroll;
 
 }
 :global(.message .ant-tabs-nav-wrap){
@@ -69,5 +71,10 @@ let otherNav = ['SystemNotification','AnswerMe','Qme','Chat','LikeView','MessSet
   margin: 0;
 }
 
-
+:global(.ant-tabs,.ant-tabs-top){
+  width: 100%;
+}
+:global(.ant-tabs-content-holder){
+  overflow: auto;
+}
 </style>

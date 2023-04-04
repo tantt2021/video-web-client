@@ -3,12 +3,12 @@
         <img src="../../../assets/img/yatou.png" alt="">
         <div class="answer-content">
             <p>
-                <strong>推土机</strong>
+                <strong>{{ content.sender_id }}</strong>
                 回复了 我 的评论
             </p>
-            <p>式子这都不会</p>
+            <p>{{ content.message_text }}</p>
             <div>
-                <span>2022.2.3 12:33</span>
+                <span>{{ content.createTime }}</span>
                 <button><MessageOutlined/> 回复</button>
                 <button><LikeOutlined/> 点赞</button>
             </div>
@@ -18,6 +18,9 @@
 </template>
 <script lang="ts" setup>
 import { EllipsisOutlined,MessageOutlined,LikeOutlined,ShareAltOutlined } from "@ant-design/icons-vue";
+
+const props = defineProps(["content"]);
+
 </script>
 
 <style lang="scss" scoped>

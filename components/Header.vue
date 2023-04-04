@@ -1,6 +1,5 @@
 <template>
   <div class="header">
-    <NuxtLink to="/"><strong>QOOT</strong></NuxtLink>
     <div class="search">
       <input type="text" placeholder="搜索" v-model="keyword" />
       <button @click="search"><search-outlined /></button>
@@ -11,21 +10,21 @@
     <div v-if="hasLogin" class="right-entry">
       <NuxtLink to="/message">
         <mail-two-tone two-tone-color="#44bc87" />
-        消息
+        <strong>消息</strong>
       </NuxtLink>
       <NuxtLink to="/star">
         <star-two-tone two-tone-color="#44bc87" />
-        收藏
+        <strong>收藏</strong>
       </NuxtLink>
       <NuxtLink to="/history">
         <clock-circle-two-tone two-tone-color="#44bc87"/>
-        历史记录
+        <strong>历史记录</strong>
       </NuxtLink>
       <!-- 创作中心 -->
       <a-dropdown>
         <NuxtLink class="ant-dropdown-link" @click.prevent>
           <alert-two-tone two-tone-color="#44bc87" />
-          创作中心
+          <strong>创作中心</strong>
         </NuxtLink>
         <template #overlay>
           <a-menu>
@@ -62,7 +61,7 @@
               alt=""
               :style="{ width: '1.5rem', borderRadius: '50%' }"
             />
-            个人空间
+            <strong>{{ user.username }}</strong>
           </div>
         </a-popover>
       </NuxtLink>
@@ -70,7 +69,7 @@
     <div v-else class="right-entry">
       <button @click="openLoginModal">
         <robot-outlined />
-        登录
+        <strong>登录</strong>
       </button>
       <!-- 登录窗口 -->
     </div>
@@ -132,9 +131,12 @@ watch(
 );
 provide("loginVisible", loginVisible);
 // 退出登录
+const router = useRouter();
 const logout = () => {
   user.logout();
+  router.push('/');
   message.success("已退出登录", 2.5);
+
 };
 
 // 用户个人中心菜单
@@ -143,11 +145,14 @@ const userMenuVisible = ref(false);
 
 <style lang="scss" scoped>
 .header {
-  // margin: 0 2rem;
+  background-color: #fff;
+  padding: 0 2rem;
   display: flex;
   justify-content: space-between;
   height: 3.5rem;
   line-height: 3.5rem;
+  flex-wrap: nowrap;
+  
   .search {
     flex-shrink: 0;
     input {
@@ -190,13 +195,20 @@ const userMenuVisible = ref(false);
       // transition: all 0.5s;
       display: inline-block;
       padding: 0rem 1rem;
-      &:hover {
-        animation: linkHover 0.5s;
+      &:hover span  {
+        animation: linkHover 0.5s ;
+      }
+      &:hover img{
+        animation: linkHover 0.5s ;
+      }
+      strong{
+        vertical-align: middle;
       }
     }
     button {
       float: right;
       border: 0;
+      padding-right: 1rem;
     }
   }
 }
@@ -223,5 +235,16 @@ p {
 }
 :global(.ant-popover-inner-content) {
   text-align: center;
+}
+
+@media screen and (max-width:720px) {
+  a strong{
+    display: none;
+  }
+}
+@media screen and (max-width:550px) {
+  .header .right-entry a{
+    padding: 0 .5rem;
+  }
 }
 </style>

@@ -5,11 +5,11 @@
       <!-- 视频基本数据 -->
       <div class="video-data">
         <img src="../../assets/svg/bfl.svg" alt="" />
-        <em>111</em>
+        <em>{{ videoData.views }}</em>
         <img src="../../assets/svg/dm.svg" alt="" />
-        <em>22</em>
+        <em>{{ videoData.marqueeCount }}</em>
         <img src="../../assets/svg/time.svg" alt="" />
-        <em>2023.2.27 13:14</em>
+        <em>{{ videoData.createTime }}</em>
       </div>
       <div
         class="video"
@@ -44,18 +44,17 @@
           :fullScreen="fullScreen"
         />
         <video
-          src="../../assets/video/樱花草.mp4"
+          :src="videoData.videoFile"
           ref="video"
           @click="handlePlay(!play)"
           @dblclick="handleScreen(!fullScreen)"
         >
-          11111111111
         </video>
       </div>
 
       <!-- 发弹幕 -->
       <div class="interaction">
-        <span>xx人在看,已装填xxx条弹幕</span>
+        <div>xx人在看,已装填xxx条弹幕</div>
         <a-input-search
           v-model:value="marquee"
           placeholder="发个弹幕试试吧~"
@@ -68,12 +67,12 @@
       <!-- 点赞收藏 -->
       <div class="operate">
         <div>
-          <like-two-tone two-tone-color="#44bc87" />
-          <em>999</em>
+          <like-two-tone two-tone-color="#000" @click="thumbup"/>
+          <em>{{ videoData.likeCount }}</em>
           <star-two-tone two-tone-color="#44bc87" />
-          <em>333</em>
+          <em>{{ videoData.starCount }}</em>
           <share-alt-outlined />
-          <em>123</em>
+          <em>{{ videoData.shareCount }}</em>
         </div>
         <div class="complain">
           <warning-outlined />
@@ -81,9 +80,7 @@
         </div>
       </div>
       <div class="tag-list">
-        <a-tag>Tag 1</a-tag>
-        <a-tag>Tag 1</a-tag>
-        <a-tag>Tag 1</a-tag>
+        <a-tag v-for="(item,idx) in type" :key="idx">{{ item }}</a-tag>
       </div>
       <!-- 评论 -->
       <h3>评论区</h3>
@@ -97,7 +94,7 @@
         </div>
         <button class="functionButton">表情</button>
         <button class="functionButton">图片</button>
-        <button @click="commit('1级评论')" class="functionButton">
+        <button class="functionButton">
           发送
         </button>
       </div>
@@ -110,11 +107,11 @@
           @click="navigateTo('/user/self')"
         />
         <div class="up-description">
-          <h4 @click="navigateTo('/user/self')">tantt</h4>
-          <p>eat chicken</p>
+          <h4 @click="navigateTo(`/user/${videoData.authorId}`)">{{ videoData.author }}</h4>
+          <p>{{ videoData.author }}</p>
         </div>
         <a-button
-          :type="subscribe === '关注' ? 'primary' : ''"
+          :type="subscribe === '关注' ? 'primary' : 'dashed'"
           class="subscribe"
           @click="addSubscribe"
         >
@@ -148,9 +145,19 @@ import VideoCard from "@/components/VideoCard.vue";
 import Controls from "@/components/Controls.vue";
 import { formatTime } from "@/utils/index";
 import Marque from "@/components/Marque.vue";
-let title = ref("title");
+import { getVideo } from "~~/api/video";
+import type {Video} from "@/types";
+// 
+const route = useRoute();
+let videoData = ref<Video>({});
+let title = ref("");
 
-// 关注
+
+
+
+
+
+// 是否已关注
 let subscribe = ref("关注");
 let addSubscribe = () => {
   subscribe.value = subscribe.value === "已关注" ? "关注" : "已关注";
@@ -160,9 +167,10 @@ let addSubscribe = () => {
 let controlsVisible = ref(false);
 
 // 播放暂停
-let video = ref(null);
+let video = ref<HTMLVideoElement>();
 let play = ref(false);
 const handlePlay = (e: boolean) => {
+  if(!video.value) return
   if (video.value.paused && e) {
     // 播放
     video.value.play();
@@ -176,17 +184,18 @@ const handlePlay = (e: boolean) => {
 };
 const resetInterval = () => {
   timer = setInterval(() => {
-    // currentTime.value = formatTime(video.value.currentTime);
+    if(!video.value) return
     currentTime.value = video.value.currentTime;
   }, 50);
 };
 
 // 全屏
-let videoBox = ref(null);
+let videoBox = ref<HTMLElement>();
 let fullScreen = ref(false);
 const handleScreen = (e: boolean) => {
+  if(!videoBox.value) return
   let requestMethod =
-    videoBox.value.requestFullScreen ||
+    videoBox.value.requestFullscreen ||
     videoBox.value.webkitRequestFullScreen ||
     videoBox.value.mozRequestFullScreen ||
     videoBox.value.msRequestFullscreen;
@@ -204,7 +213,7 @@ const handleScreen = (e: boolean) => {
       document.msExitFullscreen();
     } else if (document.mozCancelFullScreen) {
       document.mozCancelFullScreen();
-    } else if (document.webkitCancelFullScreen) {
+    } else if (document.webkitExitFullscreen) {
       document.webkitCancelFullScreen();
     }
   }
@@ -219,6 +228,8 @@ let duration = ref(0);
 
 // 进度条点击
 const handleChangeslider = (e: number) => {
+  if(!video.value) return
+
   // e就是currentTime
   currentTime.value = e;
   video.value.currentTime = e;
@@ -226,8 +237,9 @@ const handleChangeslider = (e: number) => {
 
 // 改变播放速度
 const changeVideoPlaybackRate = (e: string) => {
+  if(!video.value) return
   e = e.slice(0, e.length - 1);
-  video.value.playbackRate = e;
+  video.value.playbackRate = parseInt(e);
 };
 
 // 播放自动循环
@@ -238,11 +250,12 @@ const changeAutoloop = (e: boolean) => {
 
 // 改变音量
 const changeVolume = (e: number) => {
+  if(!video.value) return
   video.value.volume = e / 100;
 };
 
 // 发送弹幕
-let marqueeArr = ref([]);
+let marqueeArr = ref<string[]>([]);
 // 弹幕
 let marquee = ref("");
 const sendMarquee = () => {
@@ -254,8 +267,9 @@ onMounted(() => {
   console.log(document);
 
   // 格式化视频时长
-  duration.value = video.value.duration;
+  // duration.value = video.value.duration;
   // 循环播放
+  if(!video.value) return
   video.value.onended = () => {
     play.value = false;
     handlePlay(autoloop.value);
@@ -347,6 +361,22 @@ const submitMarque = () => {};
 
 // 评论内容
 let  textarea1 = ref("");
+
+
+videoData.value = await getVideo({id:route.params.id})
+title.value = videoData.value.title;
+duration.value = videoData.value.duration;
+
+// 请求用户信息
+
+// 
+console.log(videoData.value.type,"type");
+let type = computed(()=>{
+  return videoData.value.type.split("&&");
+})
+ 
+
+//  点赞
 </script>
 
 <style lang="scss" scoped>
@@ -356,12 +386,12 @@ let  textarea1 = ref("");
   // padding-right: 1rem;
   .left-container {
     width: 63rem;
+    height: 20rem;
     h1{
       margin: 0 1rem;
     }
     .video-data {
       margin: .5rem 1rem; 
-
       font-size: 0.8rem;
 
       img {
@@ -379,12 +409,19 @@ let  textarea1 = ref("");
     .video {
       position: relative;
       overflow: hidden;
+      // width: 100%;
+      height: 100%;
+      background-color: #000;
       video {
         width: 100%;
         height: 100%;
       }
       .pause{
         position: absolute;
+        background-color: rgba($color: #44bc87, $alpha: .7);
+        width: 5rem;
+        text-align: center;
+        border-radius: 1rem;
         left: 50%;
         top: 50%;
         transform:translate(-50%,-50%);
@@ -404,9 +441,11 @@ let  textarea1 = ref("");
     .interaction {
       display: flex;
       justify-content: space-between;
-      padding: 0 .5rem 0 1rem;
-      padding-bottom: .5rem;
+      padding: .5rem;
       box-shadow: 0px .5rem 1rem 1px #ddd;
+      div{
+        line-height: 2rem;
+      }
     }
     .operate {
       display: flex;

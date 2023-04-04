@@ -1,14 +1,19 @@
 <template>
-    <a-layout class="layout">
+  <div class="layout-box"> 
+    <a-layout class="layout" auto-height>
       <a-layout-sider v-model:collapsed="collapsed" :trigger="null" collapsible >
-        <a-menu v-model:selectedKeys="selectedKeys" theme="light" mode="inline"  class="menu">
+        
+        <a-menu v-model:selectedKeys="selectedKeys" theme="light" :style="{backgroundColor:'#f6f6f6'}" mode="inline"  class="menu">
+          <a-menu-item @click="navigateTo('/')">
+              <span>QOOT</span>
+          </a-menu-item>
           <a-menu-item key="1" @click="navigateTo('/')">
               <like-outlined />
-              <span>推荐</span>
+              <span>首页</span>
           </a-menu-item>
           <a-menu-item key="2" @click="navigateTo('/discover')">
               <user-outlined/>
-              <span>首页</span>
+              <span>推荐</span>
           </a-menu-item>
           
           <a-menu-item key="3" @click="navigateTo('/popular')">
@@ -36,19 +41,16 @@
         </a-menu>
       </a-layout-sider>
       <a-layout>
-        <a-layout-header style="background: #fff; padding: 0 10px;line-height: 48px;height:48px">
-          <menu-unfold-outlined v-if="collapsed" class="trigger" @click="() => (collapsed = !collapsed)" />
-          <menu-fold-outlined v-else class="trigger" @click="() => (collapsed = !collapsed)" />
-        </a-layout-header>
-        <a-layout-content :style="{ padding: '0 0px', background: '#fff', minHeight: '280px',overflowY:'scroll' }" class="layout-content">
+        <Header v-if="route.path!=='/studio'"></Header>
+
+        <a-layout-content :style="{ padding: '0', background: '#fff', minHeight: '280px',overflowY:'auto',height:route.path!=='/studio'?'calc(100vh - 3.5rem)':'100vh' }" class="layout-content">
           <nuxt-page></nuxt-page>
-          <!-- <nuxt /> -->
         </a-layout-content>
       </a-layout>
     </a-layout>
     <!-- <transition name="" mode=""> -->
       <button class="toTop" @click="toTop" v-show="show"><up-outlined /></button>
-      
+  </div>    
     <!-- </transition> -->
   </template>
   <script lang="ts" setup>
@@ -56,10 +58,6 @@
   import {
     UserOutlined,
     VideoCameraOutlined,
-    UploadOutlined,
-    MenuUnfoldOutlined,
-    MenuFoldOutlined,
-    ClockCircleOutlined,
     CustomerServiceOutlined,
     LikeOutlined,
     // ClockCircleOutlined,
@@ -68,29 +66,13 @@
     FireOutlined,
     UpOutlined,
   } from '@ant-design/icons-vue';
-  
-  
-  let navData = reactive<object[]>([
-    {
-      html: "<user-outlined /><span>首页</span>",
-      path: "/discover",
-    },
-    {
-      html: "<like-outlined /><span>推荐</span>",
-      path: "/",
-    },
-  ]);
+  const route = useRoute();
+
   
   const selectedKeys = ref<string[]>(['1']);
   let collapsed = ref<boolean>(false);
   
-  // const jump:<T>= (path:T) =>{
-    
-  // }
-  function jump(path: string){
-    // router.push({ path: path });
-    navigateTo(path);
-  }
+
   
   // 回顶按钮
   const toTop = () => {
@@ -100,7 +82,6 @@
     });
   }
   const resize = ()=>{
-      console.log(window,'win');
       if(window.innerWidth < 1000){
         collapsed.value = true;
       }else{
@@ -122,12 +103,9 @@
     });
     resize();
     window.addEventListener("resize",resize);
-  // });÷
-      // };
-    // },
   });
   </script>
-  <style scoped>
+  <style scoped lang="scss">
   .toTop{
     position: fixed;
     right: 1rem;
@@ -135,16 +113,27 @@
     border: 1px solid #ddd;
     padding: .5rem;
   }
-  .layout {
+  .layout-box{
     height: calc(100vh - 3.5rem);
-    user-select: none;
-    width: 100%;
+
+    .layout {
+      user-select: none;
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      .home{
+        padding: 0 2rem;
+        span{
+          font-weight: bolder;
+        }
+      }
+    }
   }
   .menu{
     height: 100%;
   }
   .layout-content{
-    width: 100%;
+    /* width: 100%; */
   }
   
   #components-layout-demo-custom-trigger .trigger {

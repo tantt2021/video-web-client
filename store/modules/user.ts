@@ -1,23 +1,26 @@
 import { getRegister, getLogin,getLoginByCode,getLoginByEmail } from "@/api/login";
+import {getHistorys} from "@/api/history";
 const useUserStore = defineStore('user', () => {
     let username = ref("");
     let password = ref('');
     let description = ref('');
-    let birth = ref(0);
     let sex = ref('');
     let likeCount = ref(0);
     let views = ref(0);
     let createTime = ref('');
+    let id = ref("");
+    let email = ref("");
     async function login(object: any) {
         let res = await getLogin(object);
         if (res.data !== null) {
             username.value = res.data.uname;
+            email.value = res.data.email;
             description.value = res.data.description;
-            birth.value = res.data.birth;
             sex.value = res.data.sex;
             likeCount.value = res.data.likeCount;
             views.value = res.data.views;
             createTime.value = res.data.createTime;
+            id.value = res.data.id;
         }
         return res;
     }
@@ -29,12 +32,13 @@ const useUserStore = defineStore('user', () => {
             return res;
         } else if(res.msg === '请求成功'){
             username.value = res.data.uname;
+            email.value = res.data.email;
             description.value = res.data.description;
-            birth.value = res.data.birth;
             sex.value = res.data.sex;
             likeCount.value = res.data.likeCount;
             views.value = res.data.views;
             createTime.value = res.data.createTime;
+            id.value = res.data.id;
             return res;
         }
         
@@ -42,12 +46,13 @@ const useUserStore = defineStore('user', () => {
     function logout() {
         // 清除cookie
         username.value = "";
+        email.value = "";
         description.value = "";
-        birth.value = 0;
         sex.value = "";
         likeCount.value = 0;
         views.value = 0;
         createTime.value = "";
+        id.value = "";
     }
     async function loginByCode(object:any) {
         let res = await getLoginByCode(object);
@@ -59,16 +64,18 @@ const useUserStore = defineStore('user', () => {
             return res;
         } else {
             username.value = res.data.uname;
+            email.value = res.data.email;
             description.value = res.data.description;
-            birth.value = res.data.birth;
             sex.value = res.data.sex;
             likeCount.value = res.data.likeCount;
             views.value = res.data.views;
             createTime.value = res.data.createTime;
+            id.value = res.data.id;
             return res;
         }
     }
-    return { username, password, description, sex, likeCount, views, birth, createTime, login, logout, register,loginByCode,loginByEmail };
+    
+    return { username, email, password, description, sex, likeCount, views, createTime,id, login, logout, register,loginByCode,loginByEmail };
 },
     {
         // 持久化存储

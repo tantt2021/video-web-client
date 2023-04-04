@@ -4,9 +4,13 @@
             <strong>UP荣誉周报</strong>
             <span>2023.1.21 22:00</span>
         </p>
-        <p>本周达成成就【托更一周】</p>
+        <p>{{ content.message_text }}</p>
     </div>
 </template>
+
+<script lang="ts" setup>
+const props = defineProps(["content"]);
+</script>
 
 <style lang="scss" scoped>
 .notification{

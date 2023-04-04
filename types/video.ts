@@ -1,0 +1,18 @@
+export interface Video {
+    author:string,
+    authorEmail:string,
+    authorId:string,
+    commentCount:number,
+    cover:string,
+    createTime:string,
+    duration:number,
+    id:string,
+    introduction:string,
+    likeCount:number,
+    marqueeCount:number,
+    starCount:number,
+    title:string,
+    type:string,
+    videoFile:string,
+    views:number,
+}

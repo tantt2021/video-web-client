@@ -1,9 +1,12 @@
 <template>
-  <div class=""></div>
+  <div class="" @click="click">test</div>
 </template>
 
-<script setup>
-import { reject } from "vue";
+<script lang="ts" setup>
+const emit = defineEmits(["hu"]);
+const click = () => {
+  emit("hu",'1111');
+}
 </script>
 
 <style scoped lang="scss"></style>

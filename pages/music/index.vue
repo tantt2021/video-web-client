@@ -1,44 +1,64 @@
 <template>
-  <div class="music">
-    music
-    <canvas id="canvas" width="150" height="150"></canvas>
-    <a-slider id="test" v-model:value="value1" :disabled="disabled" @change="change" :step="value1"/>
+  <div>
+    <h1>{{ currentIdx }}</h1>
+    <button @click="cancel">撤销</button>
+    <button @click="redo">取消撤销</button>
+    <ul>
+      <li v-for="(item,idx) in arr">{{ item }}</li>
+    </ul>
+    <button @click="addEle">add</button>
+  </div>
+
+  <div style="float:right">
+    <ul>
+      <li v-for="(item,idx) in history" :key="idx">{{ item }}</li>
+    </ul>
   </div>
 </template>
 
-<script lang="ts" setup>
-import { onMounted } from 'vue';
-function draw() {
-  var canvas = document.getElementById("canvas");
-  if (canvas.getContext) {
-    var ctx = canvas.getContext("2d");
+<script setup lang="ts">
+let currentIdx = ref(-1);
+let arr = ref([1,2,3]);
+let history = ref([arr.value]);
+let max = 100;
 
-    ctx.beginPath();
-    ctx.moveTo(75, 50);
-    ctx.lineTo(100, 75);
-    ctx.lineTo(100, 25);
-    ctx.fill();
+const cancel = () => {
+  if(currentIdx.value === -1){
+    return;
   }
+  currentIdx.value--;
+  history.value[currentIdx.value+2] = history.value[currentIdx.value];
+  arr.value = history.value[currentIdx.value+2];
 }
-let value1 = ref(0);
-let disabled = ref(false);
-const change = () => {
-  console.log(value1.value);
-  
+const redo = () => {
+  // 最新纪录时return
+  currentIdx.value++;
 }
-onMounted(() => {
-  draw();
-  setInterval(()=>{
-    value1.value+=0.01;
-  },20);
-});
+const addEle = () => {
+  arr.value.push(1);
+}
+watch(()=>arr.value,()=>{
+  currentIdx.value+=1;
+  history.value[currentIdx.value] = [...arr.value];
+},{
+  deep:true
+})
+
 </script>
 
-<style lang="scss">
-.music {
-  position: relative;
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
+<style lang="scss" scoped>
+.send-msg-btn{
+  position:absolute;
+  bottom: 20px;
+  right: 20px;
+}
+button{
+  padding: .3rem 1rem;
+  border: 1px solid #000;
+
+}
+button + button {
+  margin-left: 1rem;
+
 }
 </style>

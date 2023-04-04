@@ -6,11 +6,9 @@ import IconsResolver from "unplugin-icons/resolver";
 export default defineNuxtConfig({
     head: {
         title: 'My Nuxt App',
-        meta: [
-          { charset: 'utf-8' },
-          { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-          { hid: 'description', name: 'description', content: 'My awesome Nuxt.js app' }
-        ]
+        link: [
+            { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+          ]
     },
     modules: [
         // '@nuxtjs/style-resources',
@@ -38,6 +36,7 @@ export default defineNuxtConfig({
     ],
     plugins: [
         "~/plugins/ant-design-vue.ts",
+        { src: '~/plugins/LoadingPlugin.ts', mode: 'client' }
     ],
     build: {
         transpile: [

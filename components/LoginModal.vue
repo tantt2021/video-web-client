@@ -133,7 +133,7 @@ const register = async () => {
     password: password.value,
   });
   console.log("register", res);
-  if (res.data.msg === "用户已经存在") {
+  if (res.data.msg === "用户已存在") {
     message.warn(res.data.msg);
   } else {
     message.success("成为萌新", 2.5);
@@ -148,7 +148,7 @@ const register = async () => {
 const login = async () => {
   if (!validate()) return;
   let res = await user.login({
-    username: userName.value,
+    userName: userName.value,
     password: password.value,
   });
   if (res.data !== null) {

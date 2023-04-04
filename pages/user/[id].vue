@@ -7,21 +7,21 @@
         @mouseleave="changeAvatar = false"
         @click="dialog = '更换头像'"
       >
-        <img src="../../assets/img/yatou.png" alt="" />
+        <img :src="publicUser.avatar" alt=""/>
         <div class="avatar-mask" v-show="changeAvatar">更换头像</div>
       </div>
       <div class="description">
-        <h3>{{ user.email }}</h3>
-        <input v-model="user.description" maxlength="15" @keyup.enter="submitDescription" @blur="submitDescription"/>
+        <h3>{{ publicUser.uname }}</h3>
+        <input v-model="publicUser.description" maxlength="15" @keyup.enter="submitDescription" @blur="submitDescription"/>
       </div>
       <ul class="data">
         <li>
           <strong>点赞数</strong>
-          {{ user.likeCount }}
+          {{ publicUser.likeCount }}
         </li>
         <li>
           <strong>播放量</strong>
-          {{ user.views }}
+          {{ publicUser.views }}
         </li>
       </ul>
       <button @click="dialog = '修改资料'">修改资料</button>
@@ -40,25 +40,16 @@
           </li>
         </ul>
         <ul class="data-list">
-          <li @click="active = 3" :class="{ active: active === 3 }">
+          <li @click="active=3" :class="{ active: active === 3 }">
             关注数 {{ upList.length }}
           </li>
-          <li @click="active= 4" :class="{ active: active === 4 }">
+          <li @click="active=4" :class="{ active: active === 4 }">
             粉丝量 {{ followers.length }}
           </li>
         </ul>
       </nav>
       <article>
-            
-        <div v-if="active===0" class="list" >
-          <video-item v-if="portfolio.length>0" v-for="item in portfolio" :key="item" :config="item" type="work" @del-video="deleteVideo"/>
-          <a-empty v-else></a-empty>
-        </div>
-        <div v-else-if="active===2" class="list">
-          <video-item v-if="starList.length>0" v-for="item in starList" :key="item" :config="item" @cancel-star="uncollect" type="star"/>
-          <a-empty v-else></a-empty>
-        </div>
-        <div v-else-if="active === 1">
+        <div v-if="active === 1">
           <action-item />
           <action-item>
             <action-video-item />
@@ -71,10 +62,26 @@
         <div v-else-if="active === 4">
           <user-list :userList="followers"></user-list>
         </div>
-        
+        <div class="list" v-else-if="active===0">
+          <video-item 
+            v-if="portfolio.length>0" 
+            v-for="item in portfolio" 
+            :key="item" 
+            :config="item"
+          />
+            <a-empty :description="null" v-else/>
+        </div>
+        <div class="list" v-else-if="active===2">
+          <video-item 
+            v-if="portfolio.length>0" 
+            v-for="item in portfolio" 
+            :key="item" 
+            :config="item"
+          />
+            <a-empty :description="null" v-else/>
+        </div>
       </article>
     </main>
-    <!-- 编辑信息 -->
     <a-modal
       v-model:visible="modalVisible"
       :title="dialog"
@@ -88,7 +95,7 @@
           <li>
             <label for="uname">昵称</label>
             <a-input
-              v-model:value="user.username"
+              v-model:value="publicUser.uname"
               placeholder="Basic usage"
               id="uname"
             />
@@ -96,7 +103,7 @@
           <li>
             <label for="description">我的签名</label>
             <a-textarea
-              v-model:value="user.description"
+              v-model:value="publicUser.description"
               placeholder="Autosize height with  minimum and maximum number of lines"
               :auto-size="{ minRows: 2, maxRows: 5 }"
               :maxlength="25"
@@ -105,7 +112,7 @@
           <li>
             <label for="sex">性别</label>
             <a-radio-group
-              v-model:value="user.sex"
+              v-model:value="publicUser.sex"
               :options="options1"
               id="sex"
             />
@@ -143,11 +150,12 @@ import UserList from "@/components/UserList.vue";
 import { PlusOutlined, LoadingOutlined } from "@ant-design/icons-vue";
 import type { UploadChangeParam, UploadProps } from "ant-design-vue";
 import { message } from "ant-design-vue";
-import useStore from "../../store";
-import {editInformation} from "../../api/userEditMessage";
-import { getVideos,delVideo } from "~~/api/video";
-import {getFollowing,getFans,findStar,cancelStar} from "~~/api/data";
-import type {PublicUserType,Video} from "@/types";
+import useStore from "~~/store";
+import { editInformation } from "~~/api/userEditMessage";
+import { getVideos } from "~~/api/video";
+import {getFollowing,getFans} from "~~/api/data";
+import {getUserPublicInfo} from "~~/api/userEditMessage";
+import type {PublicUserType} from "@/types";
 
 useHead({
   title: '个人中心',
@@ -155,37 +163,30 @@ useHead({
     { name: 'description', content: 'My amazing site.' }
   ],
 })
+const route = useRoute();
+
+
 const { user } = useStore();
+let publicUser = ref<PublicUserType>({});
 
-// 获取用户的视频数据
-let res = await getVideos({authorId:user.id});
-let portfolio = ref(res.data);
-console.log(portfolio.value,"作品集");
+// // 获取用户的视频数据
+let portfolio = ref([]);
 
-// 获取用户收藏夹
-res = await findStar({userId:user.id});
-let starList = ref(res.data);
-console.log(starList.value,"收藏夹");
+await getVideos({authorId:route.params.id}).then(
+  res=>{
+    portfolio.value = res.data;
+  }
+)
 
 
-let activeKey = ref(0);
-let listData = ref(0);
-// 个人数据
-let publicData = ref({
-  follow: 12,
-  fans: 1,
-  thumbsUp: 12,
-  views: 12000,
-});
-// 昵称
-let uname = ref("特调酒");
+
+
 // 个签
-let description = ref("do you want to build a snowman");
 const submitDescription = async () => {
-  console.log(user.description,"提交");
+  console.log(publicUser.value.description,"提交");
   let res = await editInformation({
-    id:user.id,
-    description:user.description,
+    id:publicUser.value.id,
+    description:publicUser.value.description,
   });
   console.log(res,"修改个签");
 }
@@ -193,31 +194,31 @@ const submitDescription = async () => {
 const editUserInformation = async () => {
   dialog.value = '';
   let res = await editInformation({
-    id:user.id,
-    uname:user.username,
-    description:user.description,
-    sex:user.sex,
+    id:publicUser.value.id,
+    uname:publicUser.value.uname,
+    description:publicUser.value.description,
+    sex:publicUser.value.sex,
   })
 }
 
 
-// tab栏
+// // tab栏
 let tabArr = ref(["作品", "动态", "收藏"]);
-// 修改用户信息
-const editUserMess = () => {};
-// 修改用户信息显示
+// // 修改用户信息
+// const editUserMess = () => {};
+// // 修改用户信息显示
 
-// 性别
+// // 性别
 let sex = ref("保密");
 let options1 = ref(["男", "女", "保密"]);
 
 
-// 头像
+// // 头像
 let changeAvatar = ref(false);
 let fileList = ref([]);
 let loading = ref(false);
 let AvatarDialogVisible = ref(false);
-const imageUrl = ref<string>("");
+const imageUrl = ref("");
 const handleAva = () => {
   AvatarDialogVisible.value = false;
   loading.value = true;
@@ -234,8 +235,8 @@ const beforeUpload = (file: UploadProps["fileList"][number]) => {
   return isJpgOrPng && isLt2M;
 };
 
-// 粉丝信息，关注的人的信息
-let dataDetailVisible = ref(false);
+// // 粉丝信息，关注的人的信息
+// let dataDetailVisible = ref(false);
 
 let dialog = ref("");
 let modalVisible = ref(false);
@@ -248,60 +249,47 @@ watch(()=>dialog.value,(newV) => {
   }
 });
 
-// 关注列表和粉丝列表
+// // 关注列表和粉丝列表
 let upList = ref<PublicUserType[]>([]);
 let followers = ref<PublicUserType[]>([]);
 
 let active = ref(0);
-// main里面的内容显示
-let content = ref("video");
+// // main里面的内容显示
+// let content = ref("video");
 
 
-// 关注列表
-console.log(user.id,'1111');
-
-await getFollowing({userId:user.id}).then(
+// 用户的具体信息
+await getUserPublicInfo({id:route.params.id}).then(
   res => {
-    console.log(res.data,'getFollowing');
-    upList.value = res.data;
+    console.log(res.data,"用户公开信息");
+    publicUser.value = res.data;
+    
   }
 )
-// 粉丝列表
-await getFans({userId:user.id}).then(
-  res => {
-    console.log(res.data,'getFans');
-    followers.value = res.data;
-  }
-)
-// 取消收藏
-const uncollect = async (e:string) => {
-  console.log(e,"取消收藏的视频id");
-  console.log(user.id);
-  await cancelStar({userId:user.id,videoId:e}).then(
-    res=>{
-      console.log(res,"取消收藏回复");
-    }
-  )
-}
-
-const deleteVideo = async (e:string) => {
-  console.log(e,"删除的视频id");
-  await delVideo({id:e}).then(
-    res => {
-      console.log(res,"删除视频成功");
-      portfolio.value = portfolio.value.filter((item:Video) =>  item.id!==e);
-    }
-  )
   
-} 
+// // 关注列表
+// await getFollowing({userId:publicUser.value.id}).then(
+//   res => {
+//     console.log(res.data,'getFollowing');
+//     upList.value = res.data;
+//   }
+// )
+// // 粉丝列表
+// await getFans({userId:publicUser.value.id}).then(
+//   res => {
+//     console.log(res.data,'getFans');
+//     followers.value = res.data;
+//   }
+// )
+
+
 </script>
+
 <style lang="scss" scoped>
 .messge {
   padding-top: 5rem;
   display: flex;
   padding-left: 2rem;
-  background: linear-gradient(white, #c3f0c9);
-  padding-bottom: 1rem;
   .avatar {
     position: relative;
     img {
@@ -342,10 +330,13 @@ const deleteVideo = async (e:string) => {
       &:focus {
         border: 1px solid #44bc87;
         box-shadow: -1px -1px -1rem 0.1rem rgb(164, 163, 163);
+        background-color: #b6e0ce;
       }
       &:hover {
         border: 1px solid #44bc87;
         box-shadow: -1px -1px -1rem 0.1rem rgb(164, 163, 163);
+        background-color: #b6e0ce;
+
       }
     }
   }
@@ -373,6 +364,15 @@ const deleteVideo = async (e:string) => {
 main {
   margin-left: 2rem;
 
+  // .up-fans{
+  //   display:flex;
+  //   line-height: 100%;
+  //   margin: 0;
+  //   .user{
+  //     margin-right:2rem;
+  //     cursor: pointer;
+  //   }
+  // }
   nav {
     display: flex;
     .nav-list {
@@ -421,9 +421,6 @@ main {
       width: 80%;
     }
   }
-}
-:global(.modal span) {
-  // line-height:100%;
 }
 :global(.modal .ant-btn span) {
   line-height: 100%;

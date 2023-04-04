@@ -1,32 +1,67 @@
 <template>
     <div class="video-item">
-        <a href="http://localhost:3000/detail">
-            <img src="../assets/img/侧耳.jpg" alt="">
+        <router-link :to="`/detail/${config.id}`">
+            <img :src="config.cover" alt="">
             <div class="mask"></div>
             <div class="data">
                 <div class="data-item">
                     <img src="../assets/svg/bfl.svg" alt="">
-                    <span> 112</span>
+                    <span>{{ config.views }}</span>
                 </div>
                 <div class="data-item">
                     <img src="../assets/svg/dm.svg" alt="">
-                    <span>888</span>
+                    <span>{{ config.marqueeCount }}</span>
                 </div>
             </div>
             
-        </a>
+        </router-link>
         <div class="video-info">
-            <a  href="http://169.254.227.78:3000/history">title</a>
+            <a  href="http://169.254.227.78:3000/history">{{ config.title }}</a>
+                
+                <a-popconfirm
+                  :title="popconfirm"
+                  ok-text="确定"
+                  cancel-text="取消"
+                  @confirm="confirm"
+                  v-if="type==='work'||type==='star'"
+                >
+                  <button><export-outlined /></button>
+                </a-popconfirm>
             <p>
-                <a href="http://169.254.227.78:3000/history">头大</a>
-                ·<span> 2022-1-2</span>
+                <NuxtLink :to="`/user/${config.authorId}`" >{{ config.author }}</NuxtLink>
+                ·<span> {{ time }}</span>
             </p>
         </div>
     </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
+import { ExportOutlined } from '@ant-design/icons-vue';
+import { message } from 'ant-design-vue';
+const props = defineProps(["config","type"]);
+const emit = defineEmits(["cancel-star","del-video"])
+console.log(props.config,'config');
+let time:String;
+if(props.config)
+    time = props.config.createTime.substring(0,10);
 
+// 删除视频、取消收藏
+const confirm = (e: MouseEvent) => {
+    if(props.type==='star'){
+        // 取消收藏的api
+        emit("cancel-star",props.config.id);
+        message.success('取消收藏成功');
+    }else{
+        // 删除视频的api
+        emit("del-video",props.config.id);
+        message.success('成功删除视频');
+
+    }
+};
+// popconfirm提示
+let popconfirm = computed(()=>{
+    return props.type==='star' ? '确认取消收藏吗？':'确认删除作品吗？'
+});
 </script>
 
 <style lang="scss" scoped>
@@ -35,7 +70,10 @@
     a{
         display: inline-block;
         position: relative;
+        background-color: #ddd;
+        border-radius: .5rem;
         .mask{
+
             position: absolute;
             bottom: 0;
             left: 0;
@@ -55,11 +93,13 @@
             }
             img{
                 width: 1rem;
+                margin: 0 .3rem;
             }
             span{
                 font-weight: 400;
                 font-size: .8rem;
                 color: #fff;
+                vertical-align: middle;
             }
         }
     }
@@ -69,7 +109,10 @@
         border-radius: .5rem;
     }
     .video-info{
+        position: relative;
         a{
+            background-color: transparent;
+
             font-weight: 400;
             font-size: 1rem;
             &:hover{
@@ -84,6 +127,15 @@
             font-size: 1rem;
 
         }
+        button{
+            position: absolute;
+            bottom: 0rem;
+            right: 0rem;
+            color: #818181;
+        }
     }
+}
+:global(.ant-popover-inner-content){
+    text-align: left;
 }
 </style>

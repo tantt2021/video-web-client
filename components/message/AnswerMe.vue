@@ -1,14 +1,6 @@
 <template>
     <div class="answer-me">
-        <answer-item/>    
-        <answer-item/>    
-        <answer-item/>    
-        <answer-item/>    
-        <answer-item/>    
-        <answer-item/>    
-        <answer-item/>    
-        <answer-item/>    
-        <answer-item/>  
+        <answer-item v-for="item in answerMe" :key="item.id" :content="item"/>    
         <p>没有更多了......</p>
 
     </div>
@@ -16,6 +8,13 @@
 
 <script setup lang="ts">
 import AnswerItem from "./item/AnswerItem.vue";
+import {getMessage} from "@/api/message";
+import type { MessageType } from "~~/types";
+import useStore from "~~/store";
+let {user} = useStore();
+let answerMe = ref<MessageType[]>([]);
+answerMe.value = await getMessage({type:"reply",id:user.id});
+console.log("test",answerMe.value );
 
 </script>
 

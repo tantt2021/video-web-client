@@ -1,5 +1,5 @@
 <template>
-    <div class="video-card" @click="navigateTo('/detail')">
+    <div class="video-card" @click="navigateTo(`/detail/`)">
         <div class="video-card-cover">
             <img src="../assets/img/侧耳.jpg" alt="" :width="16*width">
         </div>

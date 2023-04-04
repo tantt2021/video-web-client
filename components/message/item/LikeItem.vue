@@ -1,6 +1,6 @@
 <template>
     <div class="like-item" @mouseenter="active=true" @mouseleave="active=false">
-        <p><span>推土机、特调酒 </span>等总计2人赞了我的的评论</p>
+        <p><span>{{ content.sender_id }} </span>等总计2人赞了我的的评论</p>
         <span class="like-time">2023.2.22 00:39</span>
 
         <div v-show="active" class="operate">
@@ -16,7 +16,7 @@ import {
     StopOutlined,
 } from '@ant-design/icons-vue';
 import {ref} from "vue";
-
+const props = defineProps(["content"]);
 let active = ref(false);
 </script>
 

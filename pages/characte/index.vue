@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="characte">
         <up-info/>
         <p>39元活动仅限一天！版型设计、图案风格都非常好看！！</p>
         <img src="../../assets/img/侧耳.jpg" alt="">
@@ -30,3 +30,9 @@ import {ShareAltOutlined,MessageOutlined} from '@ant-design/icons-vue';
 
 const current = ref<string[]>(['transmit']);
 </script>
+
+<style lang="scss" scoped>
+.characte{
+  padding: 1rem;
+}
+</style>
