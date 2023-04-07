@@ -101,7 +101,7 @@
           发送
         </button>
       </div>
-      <comment />
+      <comment  scenario="detail"></comment>
     </div>
     <div class="right-container">
       <div class="up-info">

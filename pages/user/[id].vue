@@ -261,7 +261,6 @@ let active = ref(0);
 // 用户的具体信息
 await getUserPublicInfo({id:route.params.id}).then(
   res => {
-    console.log(res.data,"用户公开信息");
     publicUser.value = res.data;
     
   }

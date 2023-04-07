@@ -4,12 +4,6 @@ import { AntDesignVueResolver } from 'unplugin-vue-components/resolvers';
 import { antdTheme } from "./utils/antdTheme";
 import IconsResolver from "unplugin-icons/resolver";
 export default defineNuxtConfig({
-    head: {
-        title: 'My Nuxt App',
-        link: [
-            { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
-          ]
-    },
     modules: [
         // '@nuxtjs/style-resources',
 
@@ -25,7 +19,7 @@ export default defineNuxtConfig({
             },
         ],
         '@pinia-plugin-persistedstate/nuxt',
-
+        '@pinia/nuxt',
     ],
     css: [
         "ant-design-vue/dist/antd.css",
@@ -36,7 +30,6 @@ export default defineNuxtConfig({
     ],
     plugins: [
         "~/plugins/ant-design-vue.ts",
-        { src: '~/plugins/LoadingPlugin.ts', mode: 'client' }
     ],
     build: {
         transpile: [

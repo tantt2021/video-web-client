@@ -30,22 +30,37 @@
               <customer-service-outlined />
               <span>音乐</span>
           </a-menu-item>
-          <a-menu-item key="7" @click="navigateTo('/live')">
+          <!-- <a-menu-item key="7" @click="navigateTo('/live')">
               <video-camera-outlined />
               <span>直播</span>
           </a-menu-item>
           <a-menu-item key="8" @click="navigateTo('/movie')">
               <play-square-outlined />
               <span>电影</span>
-          </a-menu-item>
+          </a-menu-item> -->
         </a-menu>
       </a-layout-sider>
       <a-layout>
         <Header v-if="route.path!=='/studio'"></Header>
-
         <a-layout-content :style="{ padding: '0', background: '#fff', minHeight: '280px',overflowY:'auto',height:route.path!=='/studio'?'calc(100vh - 3.5rem)':'100vh' }" class="layout-content">
-          <nuxt-page></nuxt-page>
+
+          <client-only>
+            <Suspense>
+              <nuxt-page></nuxt-page>
+
+              <template #fallback>
+                <div>加载中......</div>
+              </template>
+            </Suspense>
+            <template #placeholder>
+              <div class="loading">
+                <loading-outlined />
+              </div>
+            </template>
+          </client-only>
         </a-layout-content>
+
+        
       </a-layout>
     </a-layout>
     <!-- <transition name="" mode=""> -->
@@ -60,7 +75,7 @@
     VideoCameraOutlined,
     CustomerServiceOutlined,
     LikeOutlined,
-    // ClockCircleOutlined,
+    LoadingOutlined,
     PlaySquareOutlined,
     CrownOutlined,
     FireOutlined,
@@ -132,9 +147,17 @@
   .menu{
     height: 100%;
   }
+  .loading{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    font-size: 3rem;
+  }
   .layout-content{
     /* width: 100%; */
   }
+
   
   #components-layout-demo-custom-trigger .trigger {
     font-size: 18px;

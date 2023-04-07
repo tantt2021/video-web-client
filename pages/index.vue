@@ -50,7 +50,7 @@
     >
       <div class="show-comment">
       
-        <comment>
+        <comment scenario="short">
           <a-textarea
             v-model:value="commentContent"
             placeholder="Autosize height based on content lines"

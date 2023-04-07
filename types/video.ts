@@ -2,7 +2,7 @@ export interface Video {
     author:string,
     authorEmail:string,
     authorId:string,
-    commentCount:number,
+    shareCount:number,
     cover:string,
     createTime:string,
     duration:number,

@@ -81,7 +81,8 @@
         </li>
       </ul>
       <h5 style="color: skyblue">已经到底了...</h5>
-      <div class="bottom-submit">
+
+      <div class="bottom-submit" v-if="scenario==='short'">
         <slot></slot>
       </div>
     </div>
@@ -93,16 +94,12 @@ import dayjs from "dayjs";
 import { LikeTwoTone, DislikeOutlined } from '@ant-design/icons-vue';
 
 export default {
-  props: ["articleId", "father"],
+  props: ["articleId", "father","scenario"],
   components: {
     LikeTwoTone, DislikeOutlined,
   },
   activated() {
     // this.initComment();
-  },
-  mounted() {
-    // this.initComment();
-    // this.getUserMess();
   },
   data() {
     return {

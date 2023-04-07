@@ -42,11 +42,13 @@
           @changeAutoloop="changeAutoloop"
           @changeVolume="changeVolume"
           :fullScreen="fullScreen"
+          @add-history="submitHistory"
         />
         <video
           :src="videoData.videoFile"
           ref="video"
           @click="handlePlay(!play)"
+          @click.once="submitHistory"
           @dblclick="handleScreen(!fullScreen)"
         >
         </video>
@@ -67,11 +69,11 @@
       <!-- 点赞收藏 -->
       <div class="operate">
         <div>
-          <like-two-tone two-tone-color="#000" @click="thumbup"/>
+          <like-two-tone :two-tone-color="likeColor" @click="thumbup"/>
           <em>{{ videoData.likeCount }}</em>
-          <star-two-tone two-tone-color="#44bc87" />
+          <star-two-tone :two-tone-color="starColor" @click="collect"/>
           <em>{{ videoData.starCount }}</em>
-          <share-alt-outlined />
+          <share-alt-outlined @click="share"/>
           <em>{{ videoData.shareCount }}</em>
         </div>
         <div class="complain">
@@ -146,15 +148,17 @@ import Controls from "@/components/Controls.vue";
 import { formatTime } from "@/utils/index";
 import Marque from "@/components/Marque.vue";
 import { getVideo } from "~~/api/video";
+import { addHistory } from "~~/api/history";
 import type {Video} from "@/types";
+import useStore from "~~/store";
+import {storeToRefs} from "pinia";
+
+let {user,global} = useStore();
 // 
+let {record} = storeToRefs(global);
 const route = useRoute();
 let videoData = ref<Video>({});
 let title = ref("");
-
-
-
-
 
 
 // 是否已关注
@@ -174,6 +178,8 @@ const handlePlay = (e: boolean) => {
   if (video.value.paused && e) {
     // 播放
     video.value.play();
+    
+    
     play.value = e;
     resetInterval();
   } else {
@@ -218,6 +224,22 @@ const handleScreen = (e: boolean) => {
     }
   }
 };
+
+// 添加历史播放记录
+let once = true;
+const submitHistory = () => {
+
+  // 当前没有禁止记录历史
+  if(record.value && once){
+      addHistory({userId:user.id,videoId:route.params.id}).then(
+        res=>{
+          console.log(res);
+          once = false;
+        }
+      )
+    }
+}
+
 
 // 定时器定时访问播放时长
 let currentTime = ref(0);
@@ -264,8 +286,6 @@ const sendMarquee = () => {
 };
 let aa;
 onMounted(() => {
-  console.log(document);
-
   // 格式化视频时长
   // duration.value = video.value.duration;
   // 循环播放
@@ -297,11 +317,9 @@ onMounted(() => {
     if (isFullScreen) {
       //  进入全屏
       fullScreen.value = true;
-      console.log("进");
     } else {
       //  退出全屏
       fullScreen.value = false;
-      console.log("退");
     }
   });
   // 计算弹幕轨道数量
@@ -326,7 +344,6 @@ onBeforeUnmount(() => {
 let barrageStreamListNum = ref(0);
 let barrageStreamList = ref([]);
 const getBarrageStreamList = () => {
-  console.log(video.value.getBoundingClientRect(), "视窗");
   //   计算轨道数量
   barrageStreamListNum.value = Math.floor(
     (video.value.getBoundingClientRect().height - 100) / 36
@@ -370,13 +387,43 @@ duration.value = videoData.value.duration;
 // 请求用户信息
 
 // 
-console.log(videoData.value.type,"type");
 let type = computed(()=>{
   return videoData.value.type.split("&&");
 })
  
 
 //  点赞
+let likeColor = ref("#000");
+const thumbup = () => {
+  // 请求添加点赞数据
+  if(likeColor.value === "#000"){
+    likeColor.value = '#44bc87';
+    videoData.value.likeCount+=1;
+
+  }else{
+    likeColor.value = '#000';
+    videoData.value.likeCount-=1;
+  }
+}
+// 收藏
+let starColor = ref("#000");
+const collect = () => {
+  // 请求加入收藏夹
+  if(starColor.value === "#000"){
+    starColor.value = '#44bc87';
+    videoData.value.starCount+=1;
+
+  }else{
+    starColor.value = '#000';
+    videoData.value.starCount-=1;
+  }
+
+
+}
+// 分享
+const share = () => {
+
+}
 </script>
 
 <style lang="scss" scoped>

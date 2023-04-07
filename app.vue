@@ -4,6 +4,9 @@
   </div>
 </template>
 <script lang="ts" setup>
+useHead({
+  link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
+})
 let route = useRoute();
 
 </script>

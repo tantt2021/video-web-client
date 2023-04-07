@@ -31,7 +31,6 @@ const fetch = (url: string, options?: any, headers?: any): Promise<any> => {
                 return
             }
             const value: ResOptions<any> = data.value
-            console.log('useFetchResData: ', value)
             if (!value) {
                 // 这里处理错你自定义的错误，例如code !== 1
                 throw createError({

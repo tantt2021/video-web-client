@@ -160,12 +160,10 @@ const { user } = useStore();
 // 获取用户的视频数据
 let res = await getVideos({authorId:user.id});
 let portfolio = ref(res.data);
-console.log(portfolio.value,"作品集");
 
 // 获取用户收藏夹
 res = await findStar({userId:user.id});
 let starList = ref(res.data);
-console.log(starList.value,"收藏夹");
 
 
 let activeKey = ref(0);
@@ -177,17 +175,12 @@ let publicData = ref({
   thumbsUp: 12,
   views: 12000,
 });
-// 昵称
-let uname = ref("特调酒");
 // 个签
-let description = ref("do you want to build a snowman");
 const submitDescription = async () => {
-  console.log(user.description,"提交");
   let res = await editInformation({
     id:user.id,
     description:user.description,
   });
-  console.log(res,"修改个签");
 }
 // 修改多项信息
 const editUserInformation = async () => {
@@ -262,14 +255,12 @@ console.log(user.id,'1111');
 
 await getFollowing({userId:user.id}).then(
   res => {
-    console.log(res.data,'getFollowing');
     upList.value = res.data;
   }
 )
 // 粉丝列表
 await getFans({userId:user.id}).then(
   res => {
-    console.log(res.data,'getFans');
     followers.value = res.data;
   }
 )

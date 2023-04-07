@@ -27,7 +27,6 @@ let recommendList = ref<Video[]>([]);
 // 获取推荐视频
 await getAllVideos().then(
   res=>{
-    console.log(res,'推荐视频');
     recommendList.value = res.data;
   }
 )

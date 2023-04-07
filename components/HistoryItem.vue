@@ -15,7 +15,7 @@
             </a-popconfirm>
             <p>
                 <span @click="navigateTo(`/user/${content.authorId}`)" class="user">{{ content.author }}</span>
-                <span>{{ content.watchAt }}</span>
+                <span>{{ time }}</span>
             </p>
         </div>
     </div>
@@ -35,6 +35,15 @@ const confirmDel = () => {
 const cancelDel = () => {
 
 }
+
+let time = computed(()=>{
+    let date = new Date(props.content.watchedAt);
+    let year = date.getFullYear();
+    let month = date.getMonth() + 1;
+    let day = date.getDate();
+    return `${year}-${month}-${day}`;
+});
+
 </script>
 
 <style lang="scss" scoped>
@@ -79,9 +88,12 @@ const cancelDel = () => {
         }
         p{
             margin: 0;
+            width: 30rem;
             span{
+                display: inline-block;
+                width: 10rem;
                 margin-right: 5rem;
-                color: #5e5e5e;
+                color: #a6a2a2;
                 
             }
             .user{

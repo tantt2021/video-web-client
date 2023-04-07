@@ -15,7 +15,7 @@
 
     <div class="operate">
       <div>
-      <span  @click="handlePlay" class="play-pause">
+      <span  @click="handlePlay" class="play-pause" @click.once="$emit('addHistory')">
           <caret-right-outlined v-if="!play"/>
           <pause-outlined v-else/>
       </span>
@@ -103,6 +103,8 @@ import {
   FullscreenExitOutlined,
 } from '@ant-design/icons-vue';
 import {watch,onMounted} from "vue";
+import {formatTime} from "@/utils/index";
+
 const emit = defineEmits([
   "handlePlay",
   "handleScreen",
@@ -110,8 +112,8 @@ const emit = defineEmits([
   "changeVideoPlaybackRate",
   "changeAutoloop",
   "changeVolume",
+  "addHistory"
 ]);
-import {formatTime} from "@/utils/index";
 
 const props = defineProps({
   duration: {

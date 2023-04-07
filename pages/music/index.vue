@@ -14,9 +14,17 @@
       <li v-for="(item,idx) in history" :key="idx">{{ item }}</li>
     </ul>
   </div>
+  <button @click="play" @click.once="submit">button</button>
 </template>
 
 <script setup lang="ts">
+const play = () => {
+  console.log("play");
+}
+const submit = () => {
+  console.log("submit");
+}
+
 let currentIdx = ref(-1);
 let arr = ref([1,2,3]);
 let history = ref([arr.value]);
