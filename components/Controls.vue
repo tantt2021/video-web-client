@@ -146,22 +146,12 @@ let formatter = (value: number) => {
 };
 // 监听播放时长，改变进度条
 let NumberDuration = ref(0);
-watch(()=>props.currentTime,()=>{
-    // 视频时长的数字形式 
-    // let minArr = props.duration.split(":");
-    // NumberDuration.value = +minArr[0] * 60 + +minArr[1];
-    // minArr = props.currentTime.split(":");
-    // 视频当前播放时长的数字形式 
-    // let cu = +minArr[0] * 60 + +minArr[1];
-    // 进度条的形式
-    // sliderValue.value =  cu / NumberDuration.value * 1000;
-});
+
 let sliderDisabled = ref(false);
 // 进度条被拖动
 const sliderChange = (e) => {
   // e/100*NumberDuration.value就是NUmberCurrentTime;
   // 改变currentTime  
-  console.log(e,'eeee');
   
   sliderValue.value = e;
   emit("handleChangeslider",+e);

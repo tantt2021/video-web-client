@@ -40,6 +40,8 @@ import { ExportOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
 const props = defineProps(["config","type"]);
 const emit = defineEmits(["cancel-star","del-video"])
+
+// 时间格式化
 let time:String;
 if(props.config)
     time = props.config.createTime.substring(0,10);

@@ -18,7 +18,7 @@
         <button size="small">清空历史</button>
       </a-popconfirm>
     </div>
-    <div v-if="!record" class="stop-his-tip">
+    <div v-if="pause_history===1" class="stop-his-tip">
       <h1>已暂停记录</h1>
       <p>记录历史播放功能已暂停</p>
     </div>
@@ -46,6 +46,7 @@ import {getHistorys,delHistory} from "@/api/history";
 import type {HistoryType} from "@/types";
 import { message } from "ant-design-vue";
 import {storeToRefs} from "pinia";
+import { editInformation } from "~~/api/userEditMessage";
 useHead({
   title: '历史记录',
   meta: [
@@ -65,7 +66,7 @@ const router = useRouter();
 
 
 // 请求用户的历史记录
-const { user,global } = useStore();
+const { user } = useStore();
 console.log(user.id,"id");
 let history = ref<HistoryType[]>([]);
 const getHistory = async () => {
@@ -112,20 +113,22 @@ const cancelDel = () => {
 }
 
 // 暂停记录历史
-let {record} = storeToRefs(global);
+let {pause_history,id} = storeToRefs(user);
 const pauseRecord = () => {
-  global.handleTest();
-  console.log(record.value);
-  if(record.value)
-    message.success("已恢复记录");
-  else
+  // user.handlePause_istory();
+  pause_history.value = pause_history.value?0:1;
+
+  editInformation({id,pause_history:pause_history.value});
+  if(pause_history.value)
     message.success("已暂停记录");
+  else
+    message.success("已恢复记录");
 }
 let controlRecord = computed(() => {
-  if(record.value){
-    return "暂停记录历史";
-  }else{
+  if(pause_history.value){
     return "继续记录历史";
+  }else{
+    return "暂停记录历史";
   }
 });
 // 滚动加载

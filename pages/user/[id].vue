@@ -12,7 +12,7 @@
       </div>
       <div class="description">
         <h3>{{ publicUser.uname }}</h3>
-        <input v-model="publicUser.description" maxlength="15" @keyup.enter="submitDescription" @blur="submitDescription"/>
+        <p>{{ publicUser.description }}</p>
       </div>
       <ul class="data">
         <li>
@@ -24,7 +24,7 @@
           {{ publicUser.views }}
         </li>
       </ul>
-      <button @click="dialog = '修改资料'">修改资料</button>
+      <button @click="follow" :class="{'is-follow':isFollow?'isFollow':''}">{{isFollow?'已关注':'关注'}}</button>
     </div>
 
     <main>
@@ -57,10 +57,10 @@
           <action-item></action-item>
         </div>
         <div v-else-if="active === 3">
-          <user-list :userList="upList"></user-list>
+          <user-list :userList="upList" type="follow"></user-list>
         </div>
         <div v-else-if="active === 4">
-          <user-list :userList="followers"></user-list>
+          <user-list :userList="followers" type="fans"></user-list>
         </div>
         <div class="list" v-else-if="active===0">
           <video-item 
@@ -153,8 +153,9 @@ import { message } from "ant-design-vue";
 import useStore from "~~/store";
 import { editInformation } from "~~/api/userEditMessage";
 import { getVideos } from "~~/api/video";
-import {getFollowing,getFans} from "~~/api/data";
+import {getFollowing,getFans,handleFollow} from "~~/api/data";
 import {getUserPublicInfo} from "~~/api/userEditMessage";
+
 import type {PublicUserType} from "@/types";
 
 useHead({
@@ -181,15 +182,7 @@ await getVideos({authorId:route.params.id}).then(
 
 
 
-// 个签
-const submitDescription = async () => {
-  console.log(publicUser.value.description,"提交");
-  let res = await editInformation({
-    id:publicUser.value.id,
-    description:publicUser.value.description,
-  });
-  console.log(res,"修改个签");
-}
+
 // 修改多项信息
 const editUserInformation = async () => {
   dialog.value = '';
@@ -258,29 +251,43 @@ let active = ref(0);
 // let content = ref("video");
 
 
-// 用户的具体信息
-await getUserPublicInfo({id:route.params.id}).then(
+
+  
+// 关注该用户
+let isFollow = ref(false);
+const follow = async () => {
+  handleFollow({userId:user.id,followId:route.params.id}).then(
+    res=>{
+      console.log(res,"关注");
+    }
+  )
+  isFollow.value = !isFollow.value;
+}
+
+// 关注列表
+await getFollowing({userId:route.params.id}).then(
   res => {
-    publicUser.value = res.data;
-    
+    console.log(res.data,'getFollowing');
+    upList.value = res.data;
   }
 )
-  
-// // 关注列表
-// await getFollowing({userId:publicUser.value.id}).then(
-//   res => {
-//     console.log(res.data,'getFollowing');
-//     upList.value = res.data;
-//   }
-// )
-// // 粉丝列表
-// await getFans({userId:publicUser.value.id}).then(
-//   res => {
-//     console.log(res.data,'getFans');
-//     followers.value = res.data;
-//   }
-// )
+// 粉丝列表
+await getFans({userId:route.params.id}).then(
+  res => {
+    console.log(res.data,'getFans');
+    followers.value = res.data;
+  }
+)
 
+// 用户的具体信息
+await getUserPublicInfo({userId:user.id,followId:route.params.id}).then(
+  res => {
+    publicUser.value = res.data.publicUserInfo;
+    if(res.data.isFollow){
+      isFollow.value = true;
+    }
+  }
+)
 
 </script>
 
@@ -351,13 +358,22 @@ await getUserPublicInfo({id:route.params.id}).then(
     }
   }
   button {
-    margin-top: 1rem;
+    margin-top: 3rem;
     font-size: 0.9rem;
     margin-right: 2rem;
-    padding: 0 0.5rem;
+    padding: .2rem 1rem;
+    background-color: #44bc87;
+    color: #fff;
+    width: 5rem;
+    height: 100%;
+    transition:all .3s;
     &:hover {
-      color: #44bc87;
+      border-radius: .3rem;
     }
+  }
+  .is-follow{
+    background-color: #fff;
+    color: #44bc87;
   }
 }
 main {

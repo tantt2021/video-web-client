@@ -1,5 +1,6 @@
 <template>
   <div class="platform">
+    <a-slider id="test" v-model:value="progress" :disabled="true" class="progress" v-show="uploading"/>
     <ul class="nav">
       <li :class="{active:active===0}" @click="active=0">
         发布视频
@@ -108,9 +109,10 @@
 import { ref } from "vue";
 import { InboxOutlined } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
-import {uploadVideo} from "@/api/video";
+import {uploadVideo, uploadLargeFileInfo} from "@/api/video";
 import type { UploadChangeParam, UploadProps,Upload } from 'ant-design-vue';
 import useStore from "~~/store";
+import {uploadChunk} from "@/utils/sliceUpload";
 useHead({
   title: '创作中心/视频投稿',
   meta: [
@@ -162,7 +164,7 @@ const beforeuploadVideoFile = (file: UploadProps['fileList'][number]) =>{
 
   return false;
 }
-const customRequest = (file: UploadProps['fileList'][number]) => {
+const customRequest = async (file: UploadProps['fileList'][number]) => {
   console.log(file,'file');
   const form = new FormData()
   form.append('file', file.file)
@@ -171,35 +173,118 @@ const customRequest = (file: UploadProps['fileList'][number]) => {
   console.log(form,'form');
 }
 const uploading = ref<boolean>(false);
+
+let progress = ref(0);   //进度条
+
+const resetUpload = () => {
+  // 页面元素重置
+  uploading.value = false;
+  videoFile.value = [];
+  formState.title = '';
+  formState.introduction = '';
+  formState.types = [];
+  formState.duration = 0;
+  videoCover.value = [];
+}
+
+
+
 const handleUpload = async () => {
-  console.log("handleUpload");
-  const formData = new FormData();
-  formData.append('video',originFile.value);
-  formData.append('img', originCoverFile.value);
-  formData.append('author', user.username);
-  formData.append('authorEmail', user.email);
-  formData.append('authorId', user.id);
-  formData.append('duration', formState.duration);
-  formData.append('introduction', formState.introduction);
-  formData.append('title', formState.title);
-  formData.append('type', formState.types.join("&&"));
-  uploading.value = true;
-
-  let res = await uploadVideo(formData);
-  console.log(res);
-  if(res.msg==='请求成功'){
-    uploading.value = false;
-    videoFile.value = [];
-    formState.title = '';
-    formState.introduction = '';
-    formState.types = [];
-    formState.duration = 0;
-    videoCover.value = [];
-    message.success('发布成功！到动态或个人主页查看新发布视频吧~');
+  if(originFile.value.size < 104857600 ){
+    // 文件大小 < 100MB 直接上传
+    console.log("handleUpload");
+    const formData = new FormData();
+    formData.append('video',originFile.value);
+    formData.append('img', originCoverFile.value);
+    formData.append('author', user.username);
+    formData.append('authorEmail', user.email);
+    formData.append('authorId', user.id);
+    formData.append('duration', formState.duration);
+    formData.append('introduction', formState.introduction);
+    formData.append('title', formState.title);
+    formData.append('type', formState.types.join("&&"));
+    uploading.value = true;
+    console.log(originFile.value,"大小");
+    
+    let res = await uploadVideo(formData);
+    console.log(res);
+    if(res.msg==='请求成功'){
+      resetUpload();
+      message.success('发布成功！到动态或个人主页查看新发布视频吧~');
+    }else{
+      message.error('upload error.');
+    }
   }else{
-    message.error('upload error.');
-  }
+    uploading.value = true;
+    let largeVideoInfo = new FormData();
+    largeVideoInfo.append('img', originCoverFile.value);
+    largeVideoInfo.append('author', user.username);
+    largeVideoInfo.append('authorEmail', user.email);
+    largeVideoInfo.append('authorId', user.id);
+    largeVideoInfo.append('duration', formState.duration);
+    largeVideoInfo.append('introduction', formState.introduction);
+    largeVideoInfo.append('title', formState.title);
+    largeVideoInfo.append('type', formState.types.join("&&"));
+    await uploadLargeFileInfo(largeVideoInfo).then(
+      async(res) => {
+        console.log(res);
+        let filename = res.data.videoFile.slice(29,res.data.videoFile.length);
+        console.log("handleUpload切片上传",originFile.value.size);
+        const formData = new FormData();
+        // 上传切片文件
+        // 循环上传，
+        // 计算文件总分片数
+        let chunks = [];
+        let chunkSize = 8 * 1024 * 1024; // 8M切片大小
+        let currentChunk = 0;   //当前切片索引
+        let uploadedChunks = []; // 已上传的切片
+        const totalChunks = Math.ceil(originFile.value.size / chunkSize);
+        // 生成分片列表
+        for(let i = 0; i < totalChunks; i++){
+          const start = i * chunkSize;
+          const end = start + chunkSize;
+          const chunk = originFile.value.slice(start,end);
+          chunks.push(chunk);
+        }
+        // 逐一上传
+        while(currentChunk < totalChunks){
+          const chunk = chunks[currentChunk];
+          let formData = new FormData();
+          formData.append('chunk',chunk);
+          formData.append('filename',filename);
+          formData.append('index',currentChunk.toString());
+          formData.append('total',totalChunks.toString());
+          
+          let res = await uploadChunk(formData)
+          if (res.status === 'success' && currentChunk === totalChunks - 1) {
+            progress.value = res.progress * 100 / totalChunks;
+            console.log(progress.value);
+            
+            uploadedChunks.push(currentChunk);
+            currentChunk++;
+            // 告知成功
+            resetUpload();
+            message.success('发布成功！到动态或个人主页查看新发布视频吧~');
+          }else if (res.status === 'success') {
+            progress.value = res.progress * 100 /totalChunks;
+            console.log(progress.value);
+            
+            uploadedChunks.push(currentChunk);
+            currentChunk++;
+          } else if (res.status === 'exist') {
+            uploadedChunks.push(currentChunk);
+            currentChunk++;
+            console.log('该分片已存在，跳过上传');
+          } else {
+            console.log('上传分片失败')
+            break;
+          }
 
+        }
+      }
+    )
+    
+  }
 };
 // 表单
 const loading = ref<boolean>(false);
@@ -301,7 +386,11 @@ let requireInformation = computed(()=>{
 
 <style lang="scss" scoped>
 .platform {
-  margin: 1rem;
+  .progress{
+    position: fixed;
+    top: 2.5rem;
+    width: calc(100% - 220px);
+  }
   .nav{
     display: flex;
     li{

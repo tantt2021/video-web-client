@@ -10,6 +10,7 @@ const useUserStore = defineStore('user', () => {
     let createTime = ref('');
     let id = ref("");
     let email = ref("");
+    let pause_history = ref(0);
     async function login(object: any) {
         let res = await getLogin(object);
         if (res.data !== null) {
@@ -21,6 +22,7 @@ const useUserStore = defineStore('user', () => {
             views.value = res.data.views;
             createTime.value = res.data.createTime;
             id.value = res.data.id;
+            pause_history.value = res.data.pause_history;
         }
         return res;
     }
@@ -39,6 +41,7 @@ const useUserStore = defineStore('user', () => {
             views.value = res.data.views;
             createTime.value = res.data.createTime;
             id.value = res.data.id;
+            pause_history.value = res.data.pause_history;
             return res;
         }
         
@@ -53,6 +56,7 @@ const useUserStore = defineStore('user', () => {
         views.value = 0;
         createTime.value = "";
         id.value = "";
+        pause_history.value = 0;
     }
     async function loginByCode(object:any) {
         let res = await getLoginByCode(object);
@@ -71,24 +75,17 @@ const useUserStore = defineStore('user', () => {
             views.value = res.data.views;
             createTime.value = res.data.createTime;
             id.value = res.data.id;
+            pause_history.value = res.data.pause_history;
             return res;
         }
     }
+
     
-    return { username, email, password, description, sex, likeCount, views, createTime,id, login, logout, register,loginByCode,loginByEmail };
+    return { username, email, password, description, sex, likeCount, views, createTime,id,pause_history, login, logout, register,loginByCode,loginByEmail };
 },
     {
         // 持久化存储
         persist: true,
-        //     persist: {
-        //         enabled: true,  // ??
-        //         strategies: [
-        //             {
-        //                 key: 'counter',
-        //                 storage: process.client ? localStorage : null
-        //             }
-        //         ],
-        //     }
     }
 )
 

@@ -2,7 +2,7 @@
   <div class="star">
     <a-tabs v-model:activeKey="activeKey">
       <a-tab-pane :key="idx" :tab="item" v-for="(item,idx) in tabArr" class="Favorites" >
-        <!-- <VideoItem v-for="item in 11" :key="item"/> -->
+        <VideoItem v-for="item in starList" :key="item.id" :config="item"/>
       </a-tab-pane>
     </a-tabs>
     <p>没有更多了......</p>
@@ -15,18 +15,24 @@
 <script lang="ts" setup>
 import VideoItem from "@/components/VideoItem.vue";
 import {ref,onUpdated} from "vue";
+import { findStar } from "~~/api/data";
+import useStore from "~~/store";
 useHead({
   title: '收藏',
   meta: [
     { name: 'description', content: 'My amazing site.' }
   ],
 })
+let {user} = useStore();
+
 let activeKey = ref(0);
 
 let tabArr = ref(["默认收藏夹"]);
 onUpdated(()=>{
   alert(activeKey.value);
 });
+
+let starList = await findStar({userId:user.id});
 </script>
 
 <style lang="scss" scoped>

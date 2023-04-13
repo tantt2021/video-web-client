@@ -66,10 +66,10 @@
           <action-item></action-item>
         </div>
         <div v-else-if="active === 3">
-          <user-list :userList="upList"></user-list>
+          <user-list :userList="upList" @updateFollowing="updateFollowing" type="follow"></user-list>
         </div>
         <div v-else-if="active === 4">
-          <user-list :userList="followers"></user-list>
+          <user-list :userList="followers" type="fans"></user-list>
         </div>
         
       </article>
@@ -162,8 +162,7 @@ let res = await getVideos({authorId:user.id});
 let portfolio = ref(res.data);
 
 // 获取用户收藏夹
-res = await findStar({userId:user.id});
-let starList = ref(res.data);
+let starList = ref(await findStar({userId:user.id}));
 
 
 let activeKey = ref(0);
@@ -258,6 +257,10 @@ await getFollowing({userId:user.id}).then(
     upList.value = res.data;
   }
 )
+const updateFollowing = (e:string)=> {
+  console.log(e,"following");
+  upList.value = upList.value.filter(item=>item.id!==e);
+}
 // 粉丝列表
 await getFans({userId:user.id}).then(
   res => {
@@ -271,6 +274,7 @@ const uncollect = async (e:string) => {
   await cancelStar({userId:user.id,videoId:e}).then(
     res=>{
       console.log(res,"取消收藏回复");
+      starList.value = starList.value.filter((item:Video)=>item.id!==e);
     }
   )
 }

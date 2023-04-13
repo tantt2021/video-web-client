@@ -16,7 +16,7 @@
           <div class="nav">
             <ul>
               <li>
-                <img src="../assets/img/yatou.png" alt="" @click="navigateTo('/user/self')">
+                <img src="../assets/img/yatou.png" alt="" @click="navigateTo(`/user/${item.authorId}`)">
               </li>
               <li @click="thumbup" :class="{ thumbup: isThumbup }">
                 <like-outlined />

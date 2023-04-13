@@ -4,10 +4,17 @@ export const uploadVideo = async (body:FormData) => {
     return await Http.post("video/upload",{},{},body);
 }
 
+export const uploadLargeFileInfo = async (body:FormData) => {
+    return await Http.post("video/uploadLargeFileInfo",{},{},body);
+}
+
+// 上传大文件
+export const uploadLargeFile = async (body:FormData) => {
+    return await Http.post("video/uploadLargeFile",{},{},body);
+}
+
 export const getVideo = async (params:object) => {
-    let res = await Http.post("video/getOneVideo",params);
-    console.log(res);
-    return res.data;
+    return await Http.post("video/getOneVideo",params);
 }
 
 export const getVideos = async (params:object) => {
@@ -20,4 +27,8 @@ export const getAllVideos = async () => {
 
 export const delVideo = async (params:object) => {
     return await Http.post("video/delVideo",params);
+}
+
+export const addVideoViews = async (params:object) => {
+    return await Http.post("video/addViews",params);
 }

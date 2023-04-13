@@ -1,5 +1,5 @@
 export interface PublicUserType{
-    id?:string,
+    id:string,
     avatar?:string,
     uname?:string,
     description?:string,

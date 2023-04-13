@@ -42,13 +42,13 @@
           @changeAutoloop="changeAutoloop"
           @changeVolume="changeVolume"
           :fullScreen="fullScreen"
-          @add-history="submitHistory"
+          @add-history="submitHistoryAndViews"
         />
         <video
           :src="videoData.videoFile"
           ref="video"
           @click="handlePlay(!play)"
-          @click.once="submitHistory"
+          @click.once="submitHistoryAndViews"
           @dblclick="handleScreen(!fullScreen)"
         >
         </video>
@@ -73,7 +73,7 @@
           <em>{{ videoData.likeCount }}</em>
           <star-two-tone :two-tone-color="starColor" @click="collect"/>
           <em>{{ videoData.starCount }}</em>
-          <share-alt-outlined @click="share"/>
+          <share-alt-outlined :style="{color:shareColor}" @click="share"/>
           <em>{{ videoData.shareCount }}</em>
         </div>
         <div class="complain">
@@ -106,16 +106,24 @@
       <div class="up-info">
         <img
           src="../../assets/img/yatou.png"
+          @click="navigateTo(`/user/${videoData.authorId}`)"
+          v-if="videoData.authorId!==user.id"
+        />
+        <img
+          src="../../assets/img/yatou.png"
           @click="navigateTo('/user/self')"
+          v-else
         />
         <div class="up-description">
-          <h4 @click="navigateTo(`/user/${videoData.authorId}`)">{{ videoData.author }}</h4>
-          <p>{{ videoData.author }}</p>
+          <h4 @click="navigateTo(`/user/${videoData.authorId}`)" v-if="videoData.authorId!==user.id">{{ videoData.author }}</h4>
+          <h4 @click="navigateTo('/user/self')" v-else>{{ videoData.author }}</h4>
+          <!-- <p>{{ videoData.author }}</p> -->
         </div>
         <a-button
           :type="subscribe === '关注' ? 'primary' : 'dashed'"
           class="subscribe"
           @click="addSubscribe"
+          v-if="videoData.authorId!==user.id"
         >
           {{ subscribe }}
         </a-button>
@@ -147,15 +155,16 @@ import VideoCard from "@/components/VideoCard.vue";
 import Controls from "@/components/Controls.vue";
 import { formatTime } from "@/utils/index";
 import Marque from "@/components/Marque.vue";
-import { getVideo } from "~~/api/video";
+import { getVideo,addVideoViews } from "~~/api/video";
 import { addHistory } from "~~/api/history";
+import { addStar,isStar,cancelStar,isLike,toggleLike,handleFollow } from "~~/api/data";
 import type {Video} from "@/types";
 import useStore from "~~/store";
 import {storeToRefs} from "pinia";
 
-let {user,global} = useStore();
+let {user} = useStore();
 // 
-let {record} = storeToRefs(global);
+let {pause_history} = storeToRefs(user);
 const route = useRoute();
 let videoData = ref<Video>({});
 let title = ref("");
@@ -164,6 +173,12 @@ let title = ref("");
 // 是否已关注
 let subscribe = ref("关注");
 let addSubscribe = () => {
+  handleFollow({userId:user.id,followId:videoData.value.authorId}).then(
+    res=>{
+      console.log(res,"关注");
+      
+    }
+  )
   subscribe.value = subscribe.value === "已关注" ? "关注" : "已关注";
 };
 
@@ -227,10 +242,14 @@ const handleScreen = (e: boolean) => {
 
 // 添加历史播放记录
 let once = true;
-const submitHistory = () => {
+const submitHistoryAndViews = () => {
 
+  // 添加播放量
+  addVideoViews({id:route.params.id});
   // 当前没有禁止记录历史
-  if(record.value && once){
+  if(!pause_history.value && once){
+      
+      // 添加历史记录
       addHistory({userId:user.id,videoId:route.params.id}).then(
         res=>{
           console.log(res);
@@ -261,7 +280,7 @@ const handleChangeslider = (e: number) => {
 const changeVideoPlaybackRate = (e: string) => {
   if(!video.value) return
   e = e.slice(0, e.length - 1);
-  video.value.playbackRate = parseInt(e);
+  video.value.playbackRate = parseFloat(e);
 };
 
 // 播放自动循环
@@ -380,7 +399,14 @@ const submitMarque = () => {};
 let  textarea1 = ref("");
 
 
-videoData.value = await getVideo({id:route.params.id})
+await getVideo({id:route.params.id,userId:user.id}).then(
+  res => {
+    videoData.value = res.data.videoInfo;
+    if(res.data.isFollow!==null){
+      subscribe.value = "已关注";
+    }
+  }
+)
 title.value = videoData.value.title;
 duration.value = videoData.value.duration;
 
@@ -394,8 +420,18 @@ let type = computed(()=>{
 
 //  点赞
 let likeColor = ref("#000");
-const thumbup = () => {
+await isLike({userId:user.id,videoId:route.params.id}).then(
+  res => {
+    if(res.data==="该用户已点赞此视频"){
+      likeColor.value = "#44bc87";
+    }else{
+      likeColor.value = "#000";
+    }
+  }
+)
+const thumbup = async () => {
   // 请求添加点赞数据
+  await toggleLike({userId:user.id,videoId:route.params.id});
   if(likeColor.value === "#000"){
     likeColor.value = '#44bc87';
     videoData.value.likeCount+=1;
@@ -407,13 +443,28 @@ const thumbup = () => {
 }
 // 收藏
 let starColor = ref("#000");
-const collect = () => {
+await isStar({userId:user.id,videoId:route.params.id}).then(
+  res=>{
+    if(res.data==='该用户没收藏此视频'){
+      starColor.value = "#000";
+    }else{
+      starColor.value = "#44bc87";
+
+    }
+  }
+)
+const collect = async () => {
   // 请求加入收藏夹
+
   if(starColor.value === "#000"){
+    await addStar({userId:user.id,videoId:route.params.id});
     starColor.value = '#44bc87';
+    
     videoData.value.starCount+=1;
 
   }else{
+    // 请求取消收藏
+    await cancelStar({userId:user.id,videoId:route.params.id});
     starColor.value = '#000';
     videoData.value.starCount-=1;
   }
@@ -421,8 +472,17 @@ const collect = () => {
 
 }
 // 分享
+let shareColor = ref("#000");
 const share = () => {
+  // 请求分享
+  if(shareColor.value === "#000"){
+    shareColor.value = '#44bc87';
+    // videoData.value.starCount+=1;
 
+  }else{
+    shareColor.value = '#000';
+    // videoData.value.shareCount-=1;
+  }
 }
 </script>
 

@@ -59,8 +59,8 @@
             <img
               src="../assets/img/yatou.png"
               alt=""
-              :style="{ width: '1.5rem', borderRadius: '50%' }"
-            />
+              class="avatar"
+              />
             <strong>{{ user.username }}</strong>
           </div>
         </a-popover>
@@ -203,6 +203,11 @@ const userMenuVisible = ref(false);
       }
       strong{
         vertical-align: middle;
+      }
+      .avatar{
+        width: 1.5rem;
+        border-radius: 50%;
+        margin-right: .3rem;
       }
     }
     button {
