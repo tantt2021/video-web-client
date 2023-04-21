@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <div class="platform">
     <ul class="nav">
       <li :class="{active:active===0}" @click="active=0">
@@ -172,7 +172,7 @@ const customRequest = (file: UploadProps['fileList'][number]) => {
 }
 const uploading = ref<boolean>(false);
 const handleUpload = async () => {
-  console.log("handleUpload");
+  console.log("handleUpload",originFile.value,originCoverFile.value);
   const formData = new FormData();
   formData.append('video',originFile.value);
   formData.append('img', originCoverFile.value);
@@ -330,4 +330,4 @@ let requireInformation = computed(()=>{
   width: 49%;
   margin: 0 auto;
 }
-</style>
+</style> -->

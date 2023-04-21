@@ -1,0 +1,14 @@
+// function getBase64(img: Blob, callback: (base64Url: string) => void) {
+//     const reader = new FileReader();
+//     reader.addEventListener('load', () => callback(reader.result as string));
+//     reader.readAsDataURL(img);
+//   }
+
+export const getBase64 = (file: File) => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+      });
+}

@@ -1,10 +1,10 @@
 <template>
     <div class="action-info" >
         <div class="up-info">
-            <img src="../assets/img/yatou.png" alt="">
+            <img :src="content?.avatar" class="avatar" alt="">
             <div class="up-mess">
-                <h4>tantt</h4>
-                <p>42min前·投稿了文章</p>
+                <h4 @click="navigateTo(`/user/${content?.user}`)">{{ content?.uname }}</h4>
+                <p>{{content?.createTime.slice(0,10)}}</p>
             </div>
 
             <a-dropdown placement="bottom">
@@ -29,45 +29,53 @@
         <slot>
             <main @click="navigateTo('/characte')">
                 <p>
-                    【源码】飞行的钢铁侠loading加载动画
-                    实例：飞行的钢铁侠loading加载动画技术栈：HTML+CSS效果：源码：【html】飞行的钢铁侠
+                    {{ content?.content }}
                 </p>
-                <img src="../assets/img/侧耳.jpg" alt="">
+                <div class="img-container">
+                    <div class="img-box" v-for="(item,idx) in imgArr" :key="idx" >
+                        <img :src="item" alt="">
+                    </div>
+                </div>
             </main>
         </slot>
         <div class="operate">
             <like-outlined />
-            <em>1</em>
+            {{ content?.likeCount }}
             <message-outlined />
-            <em>2</em>
-            <share-alt-outlined />
-            <em>3</em>
+            {{ content?.commentCount }}
         </div>
     </div>
 </template>
 <script lang="ts" setup>
-import {useSlots,onMounted} from "vue";
-import { EllipsisOutlined,MessageOutlined,LikeOutlined,ShareAltOutlined } from "@ant-design/icons-vue";
+import { EllipsisOutlined,MessageOutlined,LikeOutlined,ShareAltOutlined, LockFilled } from "@ant-design/icons-vue";
+import type {TextDynaimcType} from "@/types";
+const props = defineProps({
+    content:{
+        type:Object as PropType<TextDynaimcType>,
+    }
+})
 
-// const slots = useSlots();
-onMounted(()=>{
-    // if (slots.default()) {
-    //     console.log(slots.default());
-        
-    // }
+
+// 动态的图片
+let imgArr = computed(()=>{
+    if(props.content?.imgArr==='')
+        return [];
     
+    let arr = props.content?.imgArr.split("&&");
+    arr?.splice(arr.length - 1 ,1);
+    return arr;
 });
-
 </script>
   
 <style lang="scss" scoped>
 .action-info {
     padding: 1rem;
     border-bottom: 1px #ddd solid;
+    background-color: #fff;
     .up-info {
         display: flex;
 
-        img {
+        .avatar {
             width: 3rem;
             height: 3rem;
         }
@@ -78,8 +86,11 @@ onMounted(()=>{
 
             h4 {
                 margin: 0;
+                cursor: pointer;
+                &:hover{
+                    color:#44bc87;
+                }
             }
-
             p {
                 font-weight: 400;
                 font-size: .8rem;
@@ -92,10 +103,6 @@ onMounted(()=>{
 
         }
 
-    }
-    img{
-        // margin-top: 1rem;
-        width: 20rem;
     }
     .operate{
         margin-top: .8rem;
@@ -112,9 +119,25 @@ main{
     p{
         margin-top: 1rem;
     }
-    img{
-        margin-top: 1rem;
+    .img-container{
+        display: flex;
+        flex-grow: 0;
+        .img-box{
+            height: 10rem;
+            width: 10rem;
+            img{
+                width: 100%;
+                height: 100%;
+                object-fit: cover;    
+            }
+            + .img-box{
+                margin-left: 1rem;
+            }
+        }
+
     }
+    
+    
 }
 a {
     font-weight: 400;

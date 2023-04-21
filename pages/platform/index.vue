@@ -225,7 +225,7 @@ const beforeuploadVideoFile = (file: UploadProps['fileList'][number]) =>{
   return false;
 }
 const customRequest = async (file: UploadProps['fileList'][number]) => {
-  console.log(file,'file');
+  console.log(file,'file1111');
   const form = new FormData()
   form.append('file', file.file)
   form.append('contractName', file.file.name)
@@ -258,6 +258,8 @@ const handleUpload = async () => {
   if(originFile.value.size < 104857600 ){
     // 文件大小 < 100MB 直接上传
     console.log("handleUpload");
+    console.log(originFile.value,originCoverFile.value);
+    
     const formData = new FormData();
     formData.append('video',originFile.value);
     formData.append('img', originCoverFile.value);

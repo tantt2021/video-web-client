@@ -3,7 +3,7 @@
     <a-layout class="layout" auto-height>
       <a-layout>
         <Header v-if="route.path!=='/studio'"></Header>
-        <a-layout-content :style="{ padding: '0', background: '#fff', minHeight: '280px',overflowY:'auto',height:route.path!=='/studio'?'calc(100vh - 3.5rem)':'100vh' }" class="layout-content">
+        <a-layout-content :style="{ padding: '0', background: '#f6f6f6', minHeight: '280px',overflowY:'auto',height:route.path!=='/studio'?'calc(100vh - 3.5rem)':'100vh' }" class="layout-content">
 
           <client-only>
             <Suspense>

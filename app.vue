@@ -16,5 +16,6 @@ let route = useRoute();
   // max-width: 2560px;
   // min-width: 580px;
   margin: 0 auto;
+
 }
 </style>

@@ -3,3 +3,4 @@ export * from './video';
 export * from "./message";
 export * from "./history";
 export * from "./comment";
+export * from "./dynamic";
