@@ -1,6 +1,31 @@
 <template>
   <div class="video-detail">
     <div class="left-container">
+      <div class="up-info">
+        <img
+          src="../../assets/img/yatou.png"
+          @click="navigateTo(`/user/${videoData.authorId}`)"
+          v-if="videoData.authorId!==user.id"
+        />
+        <img
+          src="../../assets/img/yatou.png"
+          @click="navigateTo('/user/self')"
+          v-else
+        />
+        <div class="up-description">
+          <h4 @click="navigateTo(`/user/${videoData.authorId}`)" v-if="videoData.authorId!==user.id">{{ videoData.author }}</h4>
+          <h4 @click="navigateTo('/user/self')" v-else>{{ videoData.author }}</h4>
+          <!-- <p>{{ videoData.author }}</p> -->
+        </div>
+        <a-button
+          :type="subscribe === '关注' ? 'primary' : 'dashed'"
+          class="subscribe"
+          @click="addSubscribe"
+          v-if="videoData.authorId!==user.id"
+        >
+          {{ subscribe }}
+        </a-button>
+      </div>
       <h1>{{ title }}</h1>
       <!-- 视频基本数据 -->
       <div class="video-data">
@@ -11,6 +36,7 @@
         <img src="../../assets/svg/time.svg" alt="" />
         <em>{{ videoData.createTime }}</em>
       </div>
+      
       <div
         class="video"
         @mouseenter="controlsVisible = true"
@@ -56,7 +82,7 @@
 
       <!-- 发弹幕 -->
       <div class="interaction">
-        <div>xx人在看,已装填xxx条弹幕</div>
+        <div>已装填xxx条弹幕</div>
         <a-input-search
           v-model:value="marquee"
           placeholder="发个弹幕试试吧~"
@@ -73,12 +99,8 @@
           <em>{{ videoData.likeCount }}</em>
           <star-two-tone :two-tone-color="starColor" @click="collect"/>
           <em>{{ videoData.starCount }}</em>
-          <share-alt-outlined :style="{color:shareColor}" @click="share"/>
-          <em>{{ videoData.shareCount }}</em>
-        </div>
-        <div class="complain">
-          <warning-outlined />
-          <em>投诉</em>
+          <!-- <share-alt-outlined :style="{color:shareColor}" @click="share"/>
+          <em>{{ videoData.shareCount }}</em> -->
         </div>
       </div>
       <div class="tag-list">
@@ -87,56 +109,15 @@
       <!-- 评论 -->
       <h3>评论区</h3>
       <div class="mycomment">
-        <div class="reviewers">
-          <div class="avatar">
-            <img src="../../assets/img/yatou.png" alt="avatar" />
-          </div>
-          <a-textarea v-model:value="textarea1" placeholder="畅所欲言~" allow-clear :style="{ width: '90%' }" />
-
-        </div>
-        <button class="functionButton">表情</button>
-        <button class="functionButton">图片</button>
-        <button class="functionButton">
-          发送
-        </button>
+        <img :src="user.avatar" alt="">
+        <input type="text" v-model="commentValue" placeholder="友善评论，尽情发言">
+        <button @click="submitComment">发布</button>
       </div>
-      <comment />
+      <comment :commentList="leverComment" :videoId="route.params.id" @add-comment="sonAddComment"/>
     </div>
     <div class="right-container">
-      <div class="up-info">
-        <img
-          src="../../assets/img/yatou.png"
-          @click="navigateTo(`/user/${videoData.authorId}`)"
-          v-if="videoData.authorId!==user.id"
-        />
-        <img
-          src="../../assets/img/yatou.png"
-          @click="navigateTo('/user/self')"
-          v-else
-        />
-        <div class="up-description">
-          <h4 @click="navigateTo(`/user/${videoData.authorId}`)" v-if="videoData.authorId!==user.id">{{ videoData.author }}</h4>
-          <h4 @click="navigateTo('/user/self')" v-else>{{ videoData.author }}</h4>
-          <!-- <p>{{ videoData.author }}</p> -->
-        </div>
-        <a-button
-          :type="subscribe === '关注' ? 'primary' : 'dashed'"
-          class="subscribe"
-          @click="addSubscribe"
-          v-if="videoData.authorId!==user.id"
-        >
-          {{ subscribe }}
-        </a-button>
-      </div>
-      <div class="recommend-list">
-        <span>更多视频</span>
-        <video-card :width="10"/>
-        <video-card :width="10"/>
-        <video-card :width="10"/>
-        <video-card :width="10"/>
-        <video-card :width="10"/>
-        <video-card :width="10"/>
-      </div>
+      
+      
     </div>
   </div>
 </template>
@@ -147,20 +128,20 @@ import {
   LikeTwoTone,
   StarTwoTone,
   ShareAltOutlined,
-  WarningOutlined,
   CaretRightOutlined,
 } from "@ant-design/icons-vue";
 import comment from "@/components/Comment.vue";
-import VideoCard from "@/components/VideoCard.vue";
 import Controls from "@/components/Controls.vue";
 import { formatTime } from "@/utils/index";
 import Marque from "@/components/Marque.vue";
 import { getVideo,addVideoViews } from "~~/api/video";
 import { addHistory } from "~~/api/history";
-import { addStar,isStar,cancelStar,isLike,toggleLike,handleFollow } from "~~/api/data";
-import type {Video} from "@/types";
+import { addStar,isStar,cancelStar,isLike,toggleLike,handleFollow, getComment, addComment } from "~~/api/data";
+import type {Video,CommentType} from "@/types";
 import useStore from "~~/store";
 import {storeToRefs} from "pinia";
+import { message } from "ant-design-vue";
+
 
 let {user} = useStore();
 // 
@@ -252,7 +233,6 @@ const submitHistoryAndViews = () => {
       // 添加历史记录
       addHistory({userId:user.id,videoId:route.params.id}).then(
         res=>{
-          console.log(res);
           once = false;
         }
       )
@@ -472,17 +452,108 @@ const collect = async () => {
 
 }
 // 分享
-let shareColor = ref("#000");
-const share = () => {
-  // 请求分享
-  if(shareColor.value === "#000"){
-    shareColor.value = '#44bc87';
-    // videoData.value.starCount+=1;
+// let shareColor = ref("#000");
+// const share = () => {
+//   // 请求分享
+//   if(shareColor.value === "#000"){
+//     shareColor.value = '#44bc87';
+//     // videoData.value.starCount+=1;
 
-  }else{
-    shareColor.value = '#000';
-    // videoData.value.shareCount-=1;
+//   }else{
+//     shareColor.value = '#000';
+//     // videoData.value.shareCount-=1;
+//   }
+// }
+
+// 获取评论
+let commentList = reactive<CommentType[]>([]);
+getComment({dynamic_id:route.params.id}).then(
+  res => {
+    Object.assign(commentList,res.data);
+    // 转化成父子评论
   }
+)
+let leverComment = computed(()=>{
+  let arr:CommentType[] = [];
+  commentList.forEach(item=>{
+      if(item.parent_id === ''){
+        arr.push(item);
+      }
+  })
+  arr.forEach(item=>item.sonComment = []);   // 一级评论表
+  commentList.forEach(item=>{
+    if(item.parent_id !== ''){
+        arr.forEach(father=>{
+          if(father.id === item.parent_id){
+            // 给二级评论设置reply_username，根据parent_id找到评论，对应用户名
+            commentList.forEach(temp=>{
+              if(item.reply_user_id.indexOf(temp.user_id)===0){
+                item.reply_username = temp.uname;
+              }
+            })
+            father.sonComment.push(item);
+          }
+        })
+      }
+  })
+  return arr;
+});
+
+// 发表评论
+let commentValue = ref("");
+const submitComment = () => {
+  if(commentValue.value.trim()===''){
+    message.error("评论内容不能为空");
+    return;
+  }
+
+  addComment({
+    content : commentValue.value,
+    user_id : user.id,
+    parent_id : '',
+    dynamic_id : route.params.id,
+    reply_user_id:"",
+    type: 'video',
+  }).then(
+    res => {
+      message.success("发表评论成功！");
+      getComment({dynamic_id:route.params.id}).then(
+        res => {
+          Object.assign(commentList,res.data);
+          // 转化成父子评论
+        }
+      )
+      // let date = new Date();
+      // let DATE = `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`;
+      // commentList.push({
+      //   avatar:user.avatar,
+      //   content : commentValue.value,
+      //   createTime: DATE,
+      //   downvotes:0,
+      //   dynamic_id:route.params.id,
+      //   parent_id:'',
+      //   sonComment:[],
+      //   type:"video",
+      //   uname:user.username,
+      //   upvotes:0,
+      //   user_id:user.id
+
+      // });
+      commentValue.value = '';
+
+    }
+  )
+}
+
+// 子组件添加评论
+const sonAddComment = () => {
+  getComment({dynamic_id:route.params.id}).then(
+    res => {
+      Object.assign(commentList,res.data);
+      // 转化成父子评论
+    }
+  )
+  
 }
 </script>
 
@@ -492,7 +563,8 @@ const share = () => {
   padding-top: 1rem;
   // padding-right: 1rem;
   .left-container {
-    width: 63rem;
+    // width: 63rem;
+    width: 100%;
     height: 20rem;
     h1{
       margin: 0 1rem;
@@ -511,6 +583,36 @@ const share = () => {
 
       em {
         color: #918f8f;
+      }
+    }
+    .up-info {
+      float: right;
+      display: flex;
+      img {
+        cursor: pointer;
+        height: 3rem;
+        border-radius: 0.5rem;
+      }
+      .up-description {
+        margin-left: 0.5rem;
+        flex-grow: 1;
+        h4 {
+          // margin: 0;
+          line-height: 1rem;
+          padding: 0 1rem;
+          &:hover {
+            color: #44bc87;
+          }
+        }
+        p {
+          font-weight: 400;
+          font-size: 1rem;
+          color: #918f8f;
+        }
+      }
+      .subscribe {
+        float: right;
+        line-height: 1rem;
       }
     }
     .video {
@@ -565,9 +667,7 @@ const share = () => {
         margin-left: 3rem;
       }
       
-      .complain {
-        // float: right;
-      }
+
     }
     h3{
         margin: 0 1rem;
@@ -577,39 +677,7 @@ const share = () => {
     }
   }
 
-  .right-container {
-    width: 20rem;
-    height: 50rem;
-    margin-left: 2rem;
-    .up-info {
-      display: flex;
-      img {
-        cursor: pointer;
-        height: 3rem;
-        border-radius: 0.5rem;
-      }
-      .up-description {
-        margin-left: 0.5rem;
-        flex-grow: 1;
-        h4 {
-          // margin: 0;
-          line-height: 1rem;
-          &:hover {
-            color: #44bc87;
-          }
-        }
-        p {
-          font-weight: 400;
-          font-size: 1rem;
-          color: #918f8f;
-        }
-      }
-      .subscribe {
-        float: right;
-        line-height: 1rem;
-      }
-    }
-  }
+
   span {
     font-weight: 400;
   }
@@ -619,6 +687,31 @@ const share = () => {
   border-radius: 8px;
   padding: 10px;
   margin: 10px;
+  display: flex;
+  img{
+    height: 3rem;
+    // width: 100%;
+    border-radius: 50%;
+  }
+  input{
+    flex: 1;
+    height: 3rem;
+    padding: .2rem .7rem;
+    margin: 0 1rem;
+    background-color: #eee;
+    border: none;
+    border-radius: .4rem;
+  }
+  button{
+    height: 3rem;
+    padding: .5rem 1rem;
+    background-color: #44bc87;
+    border-radius: .4rem;
+    &:hover{
+      background-color: #7dc8a8;
+    }
+  }
+
   .reviewers {
     margin-bottom: 15px;
     margin-left: 15px;
@@ -631,7 +724,7 @@ const share = () => {
     overflow: hidden;
     display: inline-block;
     margin-right: 1rem;
-    float: left;  
+    float: left;
     // margin-top: .5rem;
     img{
       width: 100%;
@@ -642,12 +735,10 @@ const share = () => {
     margin: 10px 10px;
     border: none;
     background-color: transparent;
+    float: right;
     &:hover{
       color: skyblue;
       cursor: pointer;
-    }
-    &:nth-child(4){
-      float: right;
     }
   }
 

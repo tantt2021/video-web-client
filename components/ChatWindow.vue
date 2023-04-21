@@ -2,40 +2,47 @@
   <div class="CHAT">
     <div class="chat-win">
       <div v-for="(item, idx) in messageList" :key="idx" class="box">
-        <div :class="{ 'chat-send': item.type, 'chat-receive': !item.type }">
-          {{ item.data }}
+        <div :class="{ 'chat-send': (item.sender_id===user.id), 'chat-receive': (item.receiver_id===user.id) }">
+          {{ item.message_text }}
         </div>
       </div>
     </div>
     <div class="chat-textarea">
-      <textarea v-model="input" placeholder="" />
+      <textarea v-model="input" placeholder="" @keyup.enter="submit" />
     
       <div>
-        <SmileOutlined/>
-        <PictureOutlined/>
-        <button>发送</button>
-
+        <button @click="submit">发送</button>
       </div>
-      <!-- <a-textarea v-model:value="input" placeholder="Basic usage" :rows="4" /> -->
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import {  ref } from "vue";
-import {
-    SmileOutlined,
-    PictureOutlined,
-    
-  } from '@ant-design/icons-vue';
+import useStore from "~~/store";
+import { message } from "ant-design-vue";
+import type {MessageType} from "@/types/message";
+
+const {user} = useStore();
+const emit = defineEmits(["send-message"]);
 let props = defineProps({
   messageList: {
-    type: Array,
+    type: Array<MessageType>,
     default: [],
   },
 });
+// 发送消息
 let input = ref("");
-
+const submit = () => {
+  if(input.value.trim() === ''){
+    message.error("不可发送空白消息");
+    input.value = '';
+    return;
+  }
+  // 发送消息
+  emit("send-message",{message_text:input.value});
+  input.value = "";
+}
 </script>
 
 

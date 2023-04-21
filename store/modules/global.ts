@@ -4,7 +4,10 @@ const useGlobalStore = defineStore("global",()=>{
         record.value = !record.value;
         console.log(record.value,"record");        
     }
-    return {record,handleTest};
+    // 私信id
+    let chatId = ref("");
+    let chatUname = ref("");
+    return {record,handleTest,chatId,chatUname};
 
     
 }

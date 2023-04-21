@@ -1,14 +1,27 @@
 <template>
   <div class="header">
+    <div class="left-nav">
+          <NuxtLink to="/">
+            <like-outlined />
+            <strong>首页</strong>
+          </NuxtLink>
+          <NuxtLink to="/popular">
+            <fire-outlined />
+            <strong>排行榜</strong>
+          </NuxtLink>
+          
+    </div>
     <div class="search">
       <input type="text" placeholder="搜索" v-model="keyword" />
       <button @click="search"><search-outlined /></button>
-
-      <button class="audio" @click="audioSearch"><audio-outlined /></button>
     </div>
 
     <div v-if="hasLogin" class="right-entry">
-      <NuxtLink to="/message">
+      <NuxtLink to="/space/all">
+        <crown-outlined />
+        <strong>动态</strong>
+      </NuxtLink>
+      <NuxtLink to="/message/chat">
         <mail-two-tone two-tone-color="#44bc87" />
         <strong>消息</strong>
       </NuxtLink>
@@ -20,8 +33,13 @@
         <clock-circle-two-tone two-tone-color="#44bc87"/>
         <strong>历史记录</strong>
       </NuxtLink>
+      <!-- 视频投稿 -->
+      <NuxtLink to="/platform">
+        <alert-two-tone two-tone-color="#44bc87" />
+        <strong>视频投稿</strong>
+      </NuxtLink>
       <!-- 创作中心 -->
-      <a-dropdown>
+      <!-- <a-dropdown>
         <NuxtLink class="ant-dropdown-link" @click.prevent>
           <alert-two-tone two-tone-color="#44bc87" />
           <strong>创作中心</strong>
@@ -36,7 +54,7 @@
             </a-menu-item>
           </a-menu>
         </template>
-      </a-dropdown>
+      </a-dropdown> -->
       <!-- 个人中心 -->
       <NuxtLink to="/user/self">
         <a-popover placement="bottom" v-model:visible="userMenuVisible">
@@ -57,7 +75,7 @@
           </template>
           <div @click="userMenuVisible = !userMenuVisible">
             <img
-              src="../assets/img/yatou.png"
+              :src="user.avatar"
               alt=""
               class="avatar"
               />
@@ -97,16 +115,15 @@ import { message } from "ant-design-vue";
 import useStore from "../store";
 const { user } = useStore();
 
+const selectedKeys = ref<string[]>(['1']);
+
+
 let keyword = ref<string>("");
 // 搜索
 const search = () => {
   navigateTo("/search");
 };
 
-// 语音搜索
-const audioSearch = () => {
-  alert("语音搜索");
-};
 
 // 登录窗口
 let loginVisible = ref<boolean>(false);
@@ -152,6 +169,11 @@ const userMenuVisible = ref(false);
   height: 3.5rem;
   line-height: 3.5rem;
   flex-wrap: nowrap;
+  .left-nav{
+    a{
+      padding: 0 1rem;
+    }
+  }
   
   .search {
     flex-shrink: 0;
@@ -176,15 +198,6 @@ const userMenuVisible = ref(false);
       padding: 0 1rem;
       background-color: #44bc87;
       color: #fff;
-    }
-    .audio {
-      border: none;
-      background-color: rgb(214, 249, 234);
-      margin-left: 1rem;
-      border-radius: 20px;
-      padding: 0 0.48rem;
-      // background-color: transparent;
-      color: #44bc87;
     }
   }
   .right-entry {

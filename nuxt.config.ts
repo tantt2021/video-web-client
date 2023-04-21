@@ -4,6 +4,7 @@ import { AntDesignVueResolver } from 'unplugin-vue-components/resolvers';
 import { antdTheme } from "./utils/antdTheme";
 import IconsResolver from "unplugin-icons/resolver";
 export default defineNuxtConfig({
+    
     modules: [
         // '@nuxtjs/style-resources',
 
@@ -31,6 +32,7 @@ export default defineNuxtConfig({
     plugins: [
         "~/plugins/ant-design-vue.ts",
     ],
+    
     build: {
         transpile: [
             "lodash-es",
@@ -75,5 +77,4 @@ export default defineNuxtConfig({
                 legalComments: "none",
             },
     },
-
 })

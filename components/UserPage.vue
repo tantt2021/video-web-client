@@ -155,20 +155,6 @@
   console.log(portfolio.value,"作品集");
   
   
-  
-  let activeKey = ref(0);
-  let listData = ref(0);
-  // 个人数据
-  let publicData = ref({
-    follow: 12,
-    fans: 1,
-    thumbsUp: 12,
-    views: 12000,
-  });
-  // 昵称
-  let uname = ref("特调酒");
-  // 个签
-  let description = ref("do you want to build a snowman");
   const submitDescription = async () => {
     console.log(user.description,"提交");
     let res = await editInformation({
@@ -191,12 +177,8 @@
   
   // tab栏
   let tabArr = ref(["作品", "动态", "收藏"]);
-  // 修改用户信息
-  const editUserMess = () => {};
-  // 修改用户信息显示
   
   // 性别
-  let sex = ref("保密");
   let options1 = ref(["男", "女", "保密"]);
   
   
@@ -222,8 +204,6 @@
     return isJpgOrPng && isLt2M;
   };
   
-  // 粉丝信息，关注的人的信息
-  let dataDetailVisible = ref(false);
   
   let dialog = ref("");
   let modalVisible = ref(false);
@@ -241,8 +221,6 @@
   let followers = ref(["q", "l", "y"]);
   
   let active = ref(0);
-  // main里面的内容显示
-  let content = ref("video");
   
   
   // 关注列表

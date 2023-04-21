@@ -24,7 +24,8 @@
           {{ publicUser.views }}
         </li>
       </ul>
-      <button @click="follow" :class="{'is-follow':isFollow?'isFollow':''}">{{isFollow?'已关注':'关注'}}</button>
+      <a-button @click="jump('/message')"><send-outlined /></a-button>
+      <a-button @click="follow" :class="{'is-follow':isFollow?'isFollow':''}">{{isFollow?'已关注':'关注'}}</a-button>
     </div>
 
     <main>
@@ -147,7 +148,7 @@ import VideoItem from "@/components/VideoItem.vue";
 import ActionItem from "@/components/ActionItem.vue";
 import ActionVideoItem from "@/components/ActionVideoItem.vue";
 import UserList from "@/components/UserList.vue";
-import { PlusOutlined, LoadingOutlined } from "@ant-design/icons-vue";
+import { PlusOutlined, LoadingOutlined,SendOutlined } from "@ant-design/icons-vue";
 import type { UploadChangeParam, UploadProps } from "ant-design-vue";
 import { message } from "ant-design-vue";
 import useStore from "~~/store";
@@ -165,9 +166,10 @@ useHead({
   ],
 })
 const route = useRoute();
+const router = useRouter();
 
 
-const { user } = useStore();
+const { user,global } = useStore();
 let publicUser = ref<PublicUserType>({});
 
 // // 获取用户的视频数据
@@ -289,6 +291,17 @@ await getUserPublicInfo({userId:user.id,followId:route.params.id}).then(
   }
 )
 
+
+// 跳转私信
+const jump = (path:string) => {
+  console.log(path);
+  router.push({
+    path:"/message/chat",
+  })
+  // 私信的用户id
+  global.chatId = publicUser.value.id;
+  global.chatUname = publicUser.value.uname;
+}
 </script>
 
 <style lang="scss" scoped>
@@ -357,11 +370,16 @@ await getUserPublicInfo({userId:user.id,followId:route.params.id}).then(
       }
     }
   }
-  button {
+  button{
     margin-top: 3rem;
-    font-size: 0.9rem;
-    margin-right: 2rem;
     padding: .2rem 1rem;
+    margin-right: 2rem;
+
+  }
+  .is-follow{
+    background-color: #fff;
+    color: #44bc87;
+    font-size: 0.9rem;
     background-color: #44bc87;
     color: #fff;
     width: 5rem;
@@ -370,10 +388,6 @@ await getUserPublicInfo({userId:user.id,followId:route.params.id}).then(
     &:hover {
       border-radius: .3rem;
     }
-  }
-  .is-follow{
-    background-color: #fff;
-    color: #44bc87;
   }
 }
 main {

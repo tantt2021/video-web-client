@@ -32,3 +32,8 @@ export const delVideo = async (params:object) => {
 export const addVideoViews = async (params:object) => {
     return await Http.post("video/addViews",params);
 }
+
+// 获取排行榜
+export const getTop = async () => {
+    return await Http.get("video/getTop");
+}

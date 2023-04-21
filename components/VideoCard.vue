@@ -1,15 +1,15 @@
 <template>
-    <div class="video-card" @click="navigateTo(`/detail/`)">
+    <div class="video-card" @click="navigateTo(`/detail/${content.id}`)">
         <div class="video-card-cover">
-            <img src="../assets/img/侧耳.jpg" alt="" :width="16*width">
+            <img :src="content.cover" alt="" :width="16*width">
         </div>
         <div class="video-card-info">
-            <h2>title</h2>
+            <h2>{{ content.title }}</h2>
             <div>
-                <p class="uname" @click.stop="navigateTo('/user/self')">up</p>
+                <p class="uname" @click.stop="navigateTo(`/user/${content.authorId}`)">{{ content.author }}</p>
                 <p class="data">
-                    <img src="../assets/svg/bfl.svg" alt=""><em>111</em>
-                    <img src="../assets/svg/dm.svg" alt=""><em>22</em>
+                    <img src="../assets/svg/bfl.svg" alt=""><em>{{ content.views }}</em>
+                    <img src="../assets/svg/dm.svg" alt=""><em>{{ content.likeCount }}</em>
                 </p>
             </div>
         </div>
@@ -17,10 +17,14 @@
 </template>
 
 <script lang="ts" setup>
+import type { Video } from '~/types';
 let props = defineProps({
     width:{
         type:Number,
         default:15
+    },
+    content:{
+        type:Object,
     }
 })
 </script>
@@ -31,6 +35,8 @@ let props = defineProps({
     padding-right: 3rem;
     margin-bottom: 2rem;
     margin-right: 2rem;
+    width: 30rem;
+    height: 11rem;
     &:hover h2{
     transition:all .5s;
         color: #44bc87;
@@ -38,6 +44,8 @@ let props = defineProps({
     .video-card-cover{
         img{
             // width:15rem;
+            width: 100%;
+            height: 100%;
         }
     }
     .video-card-info{

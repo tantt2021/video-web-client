@@ -1,16 +1,12 @@
 <template>
-    <!--  -->
-    <div class="answer-item" @click="navigateTo(`/detail/${content.target_id}`)">
+    <div class="answer-item" >
         <img :src="content.avatar" alt="" @click="navigateTo(`/user/${content.sender_id}`)">
-        <div class="answer-content">
+        <div class="answer-content" >
             <p>
-                <strong  @click="navigateTo(`/user/${content.sender_id}`)">{{ content.sender_uname }}</strong>
-                回复了 我 的评论
+                <strong @click="navigateTo(`/user/${content.sender_id}`)">{{ content.sender_uname }}</strong>
+                {{ content.operate }}了我的视频
+                <span class="jump" @click="navigateTo(`/detail/${content.target_id}`)">点击查看视频详情</span>
             </p>
-            <p>{{ content.message_text }}</p>
-            <div>
-                <span>{{ content.createTime.slice(0,10) }}</span>
-            </div>
         </div>
         
     </div>
@@ -48,6 +44,7 @@ const props = defineProps(["content"]);
         strong{
             color: #000;
             cursor: pointer;
+
         }
         button{
             font-size: .8rem;
@@ -55,6 +52,11 @@ const props = defineProps(["content"]);
             &:hover ,&:hover span{
                 color: #44bc87;
             }
+        }
+        .jump{
+            color: #44bc87;
+            cursor: pointer;
+
         }
     }
 }

@@ -21,6 +21,31 @@ import {
     
   } from '@ant-design/icons-vue';
 
+let socket = ref<WebSocket | null>(null);
+let messages = reactive<object[]>([]);
+onMounted(()=>{
+    socket.value = new WebSocket('ws://localhost:3005');
+    initWebSocket();
+});
+const initWebSocket = () => {
+    if(!socket.value)return;
+    socket.value.onopen = webSocketOpen;
+    socket.value.onmessage = webSocketMessage;
+    socket.value.onclose = webSocketClose;
+    socket.value.onerror = webSocketError;
+}
+const webSocketOpen = () => {
+    console.log("websocket连接成功");
+}
+const webSocketMessage = (e:object) => {
+    console.log(e);
+}
+const webSocketClose = () => {
+    console.log("关闭");
+}
+const webSocketError = () => {
+    console.log("连接失败");
+}
 
 let arr = ref([
     {

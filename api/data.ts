@@ -49,3 +49,13 @@ export const toggleLike = async (params:object) => {
 export const isLike = async (params:object) => {
     return await Http.post("like/isLike",params);
 }
+
+// 获取评论
+export const getComment = async (params:object) => {
+    return await Http.post("comment/getComment",params);
+}
+
+// 发表评论
+export const addComment = async (params:object) => {
+    return await Http.post("comment/addComment",params);
+}

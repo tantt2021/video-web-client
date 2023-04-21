@@ -17,6 +17,7 @@
         name="file"
         @change="handleChange"
         @drop="handleDrop"
+        @reject="videoFormat"
         :supportServerRender="true"
         :before-upload="beforeuploadVideoFile"
         :max-count="1"
@@ -41,25 +42,8 @@
       >
         <a-form-item label="封面"
         name="封面">
-          <a-upload
-            :customRequest="customRequest"
-            v-model:file-list="videoCover"
-            name="avatar"
-            list-type="picture-card"
-            class="avatar-uploader"
-            :show-upload-list="true"
-            :before-upload="beforeUploadCover"
-            :maxCount="1"
-            @change="coverChange"
-            :accept="'.jpg,.jpeg,.png,.img'"
-          >
-            <img v-if="imageUrl" :src="imageUrl" alt="avatar" />
-            <div>
-              <loading-outlined v-if="loading"></loading-outlined>
-              <plus-outlined v-else></plus-outlined>
-              <div class="ant-upload-text">Upload</div>
-            </div>
-          </a-upload>
+          <img :src="result.dataURL" v-if="originCoverFile!==null" alt="" :style="{width:'10rem',paddingRight:'1rem'}">
+          <a-button type="primary" @click="showModal">{{originCoverFile!==null?'重新设置封面':'点击设置封面'}}</a-button>
         </a-form-item>
         <a-form-item label="视频标题">
           <a-input v-model:value="formState.title" />
@@ -102,6 +86,72 @@
     <div v-show="active===1">
       <a-empty/>
     </div>
+    
+    <div class="cropper-class">
+    <a-modal v-model:visible="uploadCovervisible" title="裁切封面" @ok="handleOk" @cancel="handleModalClose" style="top: 40px" :width="700" class="teleport">
+      <div class="upload-body" >
+          <input
+            ref="uploadInput"
+            type="file"
+            accept="image/jpg, image/jpeg, image/png, image/gif"
+            @change="selectFile"
+            v-if="!isShowModal"
+          />
+          <div class="cropper" v-else>
+          
+            <div class="modal-wrap">
+              <div class="modal-mask"></div>
+                <div class="modal-scroll-view">
+                  <div class="modal">
+                    <div class="modal-title">
+                      <p class="title">图片裁切</p>
+                      
+                    </div>
+                  
+                    <div class="modal-content">
+                      <!-- The component imported from `vue-picture-cropper` plugin -->
+                      <VuePictureCropper
+                        :boxStyle="{
+                          width: '100%',
+                          height: '100%',
+                          backgroundColor: '#f8f8f8',
+                          margin: 'auto',
+                        }"
+                        :img="pic"
+                        :options="{
+                          viewMode: 1,
+                          dragMode: 'crop',
+                          aspectRatio: 16 / 9,
+                        }"
+                        @ready="ready"
+                      />
+                    </div>
+                    <div class="tools">
+                        <a-button class="btn" @click="isShowModal = false">重新上传</a-button>
+                        <a-button class="btn primary" @click="getResult">裁切</a-button>
+                      </div>
+                  </div>
+                </div>
+            </div>
+
+            <!-- 展示 -->
+            <section class="section" v-if="result.dataURL && result.blobURL">
+              <!-- <p>A preview of the cropped Base64 image:</p>
+              <div class="preview">
+                <img :src="result.dataURL" />
+              </div> -->
+              <p>效果预览</p>
+              <div class="preview">
+                <img :src="result.blobURL" />
+              </div>
+            </section>
+          </div>
+      </div>
+      <template #footer>
+        <a-button key="submit" type="primary"  @click="handleOk"  v-if="isShowModal">确定</a-button>
+      </template>
+    </a-modal>
+    </div>
   </div>
 </template>
 
@@ -113,8 +163,9 @@ import {uploadVideo, uploadLargeFileInfo} from "@/api/video";
 import type { UploadChangeParam, UploadProps,Upload } from 'ant-design-vue';
 import useStore from "~~/store";
 import {uploadChunk} from "@/utils/sliceUpload";
+import VuePictureCropper, { cropper } from 'vue-picture-cropper'
 useHead({
-  title: '创作中心/视频投稿',
+  title: '视频投稿',
   meta: [
     { name: 'description', content: 'My amazing site.' }
   ],
@@ -124,8 +175,16 @@ let videoFile = ref<UploadProps['fileList']>([]);
 let originFile = ref(null);  //
 
 let active = ref(0);
+const videoFormat = (fileList) => {
+  message.error("请上传视频文件");
+  
+}
 const handleChange = (info: UploadChangeParam) => {
   // 获取源文件
+  console.log(info,"info");
+  if(info.file.type !== 'video/mp4'){
+    return;
+  }
   originFile.value = info.fileList[0].originFileObj;
 
   const status = info.file.status;
@@ -139,7 +198,7 @@ const handleChange = (info: UploadChangeParam) => {
   }
 };
 const handleDrop = (e: DragEvent) => {
-  console.log(e);
+  // console.log(e.target);
 };
 const beforeuploadVideoFile = (file: UploadProps['fileList'][number]) =>{
   console.log("beforeuploadVideoFile");
@@ -148,7 +207,8 @@ const beforeuploadVideoFile = (file: UploadProps['fileList'][number]) =>{
   if(file.type !== 'video/mp4'){
     message.error(`${file.name} is not a mp4 file`);
     videoFile.value = [];
-    return false || Upload.LIST_IGNORE;;
+    videoFile.length = 0;
+    return false;
   }
   const formdata = new FormData();
   formdata.append('name','test');
@@ -185,8 +245,13 @@ const resetUpload = () => {
   formState.types = [];
   formState.duration = 0;
   videoCover.value = [];
+  result.dataURL = '';
+  pic.value = '';
+  originCoverFile.value = null;
+  isShowModal.value = false;
+  if (!uploadInput.value) return
+    uploadInput.value.value = '';
 }
-
 
 
 const handleUpload = async () => {
@@ -310,12 +375,16 @@ const inputRef = ref(null);
 let inputVisible = ref(false);
 let inputValue = ref("");
 const handleInputConfirm = () => {
-  if(formState.types.indexOf(inputValue.value)===-1){
+  if(inputValue.value.length>10){
+    message.error("请输入小于10个字！");
+  }else if(formState.types.indexOf(inputValue.value)===-1&&inputValue.value.trim()!==''){
     formState.types.push(inputValue.value);
     inputVisible.value = false;
     setTimeout(()=>{
       inputValue.value = '';
     },0);
+  }else{
+    inputVisible.value = false;
   }
   
 };
@@ -325,15 +394,28 @@ const handleClose = (removedTag: number) => {
   formState.types.splice(removedTag,1);
 };
 const showInput = () => {
-  nextTick(()=>{
 
     inputVisible.value = true;
+    
+
+  nextTick(()=>{
+  inputRef.value.focus();
   })
 
-  inputRef.value.focus();
   // }
 };
 // 封面上传
+let uploadCovervisible = ref(false);
+const showModal = () => {
+  uploadCovervisible.value = true;
+}
+const handleOk = () => {
+  // 确定封面
+  uploadCovervisible.value = false;
+  console.log(uploadCovervisible.value,'111');
+  
+
+}
 const videoCover = ref([]);
 function getBase64(img: Blob, callback: (base64Url: string) => void) {
   const reader = new FileReader();
@@ -341,34 +423,6 @@ function getBase64(img: Blob, callback: (base64Url: string) => void) {
   reader.readAsDataURL(img);
 }
 let originCoverFile = ref(null);
-const coverChange = (info: UploadChangeParam) => {
-  console.log(info,"tar");
-  originCoverFile.value = info.fileList[0].originFileObj;
-  
-  if (info.file.status === 'uploading') {
-    loading.value = true;
-    return;
-  }
-
-  if (info.file.status === 'done') {
-    // Get this url from response in real world.
-    getBase64(info.file.originFileObj, (base64Url: string) => {
-      imageUrl.value = base64Url;
-      loading.value = false;
-    });
-  }
-  if (info.file.status === 'error') {
-    loading.value = false;
-    message.error('upload error');
-  }
-};
-const beforeUploadCover = (file: UploadProps['fileList'][number]) => {
-  console.log("beforeUploadCover");
-  const formdata = new FormData();
-  formdata.append('name','test');
-  formdata.append('file',file);
-  return false;
-};
 
 // 是否可上传，验证
 let requireInformation = computed(()=>{
@@ -382,9 +436,83 @@ let requireInformation = computed(()=>{
       }
   return true;
 });
+
+
+// 上传裁切封面
+const isShowModal = ref<boolean>(false)
+const uploadInput = ref<HTMLInputElement | null>(null)
+const pic = ref<string>('')
+const result = reactive({
+  dataURL: '',
+  blobURL: '',
+})
+
+    /**
+     * Select the picture to be cropped
+   */
+function selectFile(e: Event) {
+  // Reset last selection and results
+  pic.value = ''
+  result.dataURL = ''
+  result.blobURL = ''
+  // Get selected files
+  const { files } = e.target as HTMLInputElement
+  if (!files || !files.length) return
+    
+  // Convert to dataURL and pass to the cropper component
+  const file = files[0]
+  console.log(typeof file,"typeof file");
+  
+  const reader = new FileReader()
+  reader.readAsDataURL(file)
+  reader.onload = () => {
+    // Update the picture source of the `img` prop
+    pic.value = String(reader.result)
+    // Show the modal
+    isShowModal.value = true
+    // Clear selected files of input element
+    if (!uploadInput.value) return
+    uploadInput.value.value = ''
+
+  }
+  getResult();
+}
+
+    /**
+     * Get cropping results
+     */
+async function getResult() {
+  if (!cropper) return
+  const base64 = cropper.getDataURL()
+  const blob: Blob | null = await cropper.getBlob()
+  if (!blob) return
+  const file = await cropper.getFile({
+    fileName: 'Test file name, optional',
+  })
+  console.log({ base64, blob, file })
+  result.dataURL = base64
+  result.blobURL = URL.createObjectURL(blob)
+  originCoverFile.value = file;
+  videoCover.value.splice(0,1,originCoverFile.value);
+  // isShowModal.value = false
+}
+function ready() {
+  console.log('Cropper is ready.')
+  getResult();  //加载后就裁切一次
+}
+
+// 关闭窗口的回调,清除
+const handleModalClose = () => {
+  // pic.value = '';
+  isShowModal.value = false;
+  uploadInput.value = '';
+}
 </script>
 
 <style lang="scss" scoped>
+.teleport img{
+  width: 100%;
+}
 .platform {
   .progress{
     position: fixed;
@@ -415,8 +543,47 @@ let requireInformation = computed(()=>{
     padding-bottom: 1rem;
   }
 }
+.cover{
+  // width: 200px;
+  height: 200px;
+
+}
+.upload-body{
+  // height: 300px;
+  // display: flex;
+  .cropper{
+    display: flex;
+    justify-content: space-around;
+    .modal-scroll-view{
+      .modal{
+        .modal-title{
+          div + div {
+            padding: .5rem 0;
+          }
+        }
+        .modal-content{
+          padding-bottom: .5rem;
+        }
+        .tools{
+          button + button {
+            margin-left: .5rem;
+          }
+        }
+      }
+    }
+  }
+}
+.modal-content,.section{
+  width: 200px;
+}
 :global(.ant-upload.ant-upload-drag){
   width: 49%;
   margin: 0 auto;
+}
+.cropper-class{
+  font-size:10rem;
+  img{
+    width: 100%;
+  }
 }
 </style>

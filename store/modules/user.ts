@@ -11,6 +11,7 @@ const useUserStore = defineStore('user', () => {
     let id = ref("");
     let email = ref("");
     let pause_history = ref(0);
+    let avatar = ref("");
     async function login(object: any) {
         let res = await getLogin(object);
         if (res.data !== null) {
@@ -22,6 +23,7 @@ const useUserStore = defineStore('user', () => {
             views.value = res.data.views;
             createTime.value = res.data.createTime;
             id.value = res.data.id;
+            avatar.value = res.data.avatar;
             pause_history.value = res.data.pause_history;
         }
         return res;
@@ -41,6 +43,7 @@ const useUserStore = defineStore('user', () => {
             views.value = res.data.views;
             createTime.value = res.data.createTime;
             id.value = res.data.id;
+            avatar.value = res.data.avatar;
             pause_history.value = res.data.pause_history;
             return res;
         }
@@ -56,6 +59,7 @@ const useUserStore = defineStore('user', () => {
         views.value = 0;
         createTime.value = "";
         id.value = "";
+        avatar.value = "";
         pause_history.value = 0;
     }
     async function loginByCode(object:any) {
@@ -75,13 +79,14 @@ const useUserStore = defineStore('user', () => {
             views.value = res.data.views;
             createTime.value = res.data.createTime;
             id.value = res.data.id;
+            avatar.value = res.data.avatar;
             pause_history.value = res.data.pause_history;
             return res;
         }
     }
 
     
-    return { username, email, password, description, sex, likeCount, views, createTime,id,pause_history, login, logout, register,loginByCode,loginByEmail };
+    return { username, email, password, description, sex, avatar, likeCount, views, createTime,id,pause_history, login, logout, register,loginByCode,loginByEmail };
 },
     {
         // 持久化存储

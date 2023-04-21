@@ -15,9 +15,9 @@ const pinia = createPinia();
 //     }
 // }
 export default defineNuxtRouteMiddleware((to:any, from:any) => {
-    console.log(to.params.id);    
-    console.log(to.path);
-    console.log(from.path);
+    // console.log(to);    
+    // console.log(to.path);
+    // console.log(from.path);
     
     // navigateTo(to.path);
 })

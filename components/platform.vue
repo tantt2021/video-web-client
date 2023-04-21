@@ -112,7 +112,7 @@ import {uploadVideo} from "@/api/video";
 import type { UploadChangeParam, UploadProps,Upload } from 'ant-design-vue';
 import useStore from "~~/store";
 useHead({
-  title: '创作中心/视频投稿',
+  title: '视频投稿',
   meta: [
     { name: 'description', content: 'My amazing site.' }
   ],
