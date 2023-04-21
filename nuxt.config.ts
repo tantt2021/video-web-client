@@ -30,17 +30,23 @@ export default defineNuxtConfig({
         "assets/css/normalize.css",
     ],
     plugins: [
-        "~/plugins/ant-design-vue.ts",
+        // "~/plugins/ant-design-vue.ts",
     ],
     
     build: {
-        transpile: [
-            "lodash-es",
-            "@ant-design/icons-vue",
-            "echarts",
-            "graphql",
-        ],
-    },
+        babel: {
+          plugins: [
+            [
+              'import',
+              {
+                libraryName: 'ant-design-vue',
+                libraryDirectory: 'es',
+                style: true
+              }
+            ]
+          ]
+        }
+      },
     vite: {
         ssr: {
             noExternal: ["ant-design-vue", "dayjs"],

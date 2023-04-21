@@ -31,10 +31,11 @@
                 <p>
                     {{ content?.content }}
                 </p>
-                <div class="img-container">
-                    <div class="img-box" v-for="(item,idx) in imgArr" :key="idx" >
-                        <img :src="item" alt="">
-                    </div>
+                <div  :class="{'four-pic':isFourPic,'img-container':!isFourPic}">
+                <!-- <div class="four-pic"> -->
+                    <!-- <div class="img-box" v-for="(item,idx) in imgArr" :key="idx" > -->
+                            <img :src="item" alt="" v-for="(item,idx) in imgArr" :key="idx">
+                    <!-- </div> -->
                 </div>
             </main>
         </slot>
@@ -65,6 +66,13 @@ let imgArr = computed(()=>{
     arr?.splice(arr.length - 1 ,1);
     return arr;
 });
+
+let isFourPic = ref(false);
+watch(()=>imgArr.value,()=>{
+    isFourPic.value = imgArr.value?.length === 4
+},{
+    immediate:true
+})
 </script>
   
 <style lang="scss" scoped>
@@ -120,21 +128,46 @@ main{
         margin-top: 1rem;
     }
     .img-container{
-        display: flex;
-        flex-grow: 0;
-        .img-box{
-            height: 10rem;
-            width: 10rem;
+        // display: flex;
+        // flex-grow: 0;
+        // .img-box{
+        overflow: hidden;
             img{
-                width: 100%;
-                height: 100%;
+                height: 7rem;
+                width: 7rem;
+                margin-bottom: .2rem;
+                margin-right: .2rem;
+                // width: 100%;
+                // height: 100%;
                 object-fit: cover;    
+                float: left;
+                &:nth-child(3n+1){
+                    clear: both;
+                }
             }
-            + .img-box{
-                margin-left: 1rem;
-            }
-        }
 
+            // + .img-box{
+                // margin-left: 1rem;
+            // }
+        // }
+
+    }
+    .four-pic{
+        height: 14.4rem;
+        width: 14.4rem;
+        img{
+            height: 7rem;
+            width: 7rem;
+            margin-bottom: .2rem;
+            margin-right: .2rem;
+            // width: 100%;
+            // height: 100%;
+            object-fit: cover;    
+            float: left;
+            // &:nth-child(3n+1){
+            //     clear: both;
+            // }
+        }
     }
     
     

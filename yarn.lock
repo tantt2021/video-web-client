@@ -273,7 +273,7 @@
     "@babel/helper-plugin-utils" "^7.20.2"
     "@babel/plugin-syntax-typescript" "^7.20.0"
 
-"@babel/runtime@^7.10.5":
+"@babel/runtime@^7.10.5", "@babel/runtime@^7.18.6":
   version "7.21.0"
   resolved "https://registry.npmmirror.com/@babel/runtime/-/runtime-7.21.0.tgz#5b55c9d394e5fcf304909a8b00c07dc217b56673"
   integrity sha512-xwII0//EObnq89Ji5AKYQaRYiW/nZ3llSv29d49IuxPhKbtJoLP+9QUUZ4nVragQVtaVGeZrpB+ZtG/Pdy/POw==
@@ -1594,7 +1594,7 @@ copy-anything@^2.0.1:
   dependencies:
     is-what "^3.14.1"
 
-core-js@^3.15.1:
+core-js@^3.15.1, core-js@^3.23.5:
   version "3.30.1"
   resolved "https://registry.npmmirror.com/core-js/-/core-js-3.30.1.tgz#fc9c5adcc541d8e9fa3e381179433cbf795628ba"
   integrity sha512-ZNS5nbiSwDTq4hFosEDqm65izl2CWmLz0hARJMyNQBgkUZMIF51cQiMvIQKA6hvuaeWxQDP3hEedM1JZIgTldQ==
@@ -1902,6 +1902,14 @@ electron-to-chromium@^1.4.284:
   version "1.4.368"
   resolved "https://registry.npmmirror.com/electron-to-chromium/-/electron-to-chromium-1.4.368.tgz#75901f97d3e23da2e66feb1e61fbb8e70ac96430"
   integrity sha512-e2aeCAixCj9M7nJxdB/wDjO6mbYX+lJJxSJCXDzlr5YPGYVofuJwGN9nKg2o6wWInjX6XmxRinn3AeJMK81ltw==
+
+emoji-mart-vue-fast@^12.0.1:
+  version "12.0.1"
+  resolved "https://registry.npmmirror.com/emoji-mart-vue-fast/-/emoji-mart-vue-fast-12.0.1.tgz#0bbc5f110c5d6c607e9a178619821c18c6a91057"
+  integrity sha512-qO8F9aduHwPGEU2U1YobOH3lRXEMvrjej6KdhGMnSoMJ+OFSmNf+pUal/MbrEn0RUy+Uqc7U9sPopA+3ipK4+g==
+  dependencies:
+    "@babel/runtime" "^7.18.6"
+    core-js "^3.23.5"
 
 emoji-regex@^8.0.0:
   version "8.0.0"

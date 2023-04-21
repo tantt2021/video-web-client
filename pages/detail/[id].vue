@@ -141,7 +141,7 @@ import type {Video,CommentType} from "@/types";
 import useStore from "~~/store";
 import {storeToRefs} from "pinia";
 import { message } from "ant-design-vue";
-
+import AppPickerComposition from "~/components/AppPickerComposition.vue";
 
 let {user} = useStore();
 // 

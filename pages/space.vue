@@ -7,14 +7,14 @@
         </div>
         <div class="plugin">
           <div class="left">
-            <smile-outlined />
-            <a-popover title="上传图片" trigger="click" placement="bottom">
+            <a-popover title="上传图片" trigger="click" placement="bottom" @visibleChange="visibleChange">
               <template #content>
                 <a-upload
                   v-model:file-list="dynamicImgs"
                   list-type="picture-card"
                   :before-upload="beforeUpload"
                   @change="handleChange"
+                  
                 >
                   <div v-if="dynamicImgs.length < 9">
                     <plus-outlined />
@@ -22,10 +22,12 @@
                   </div>
                 </a-upload>
               </template>
-                <picture-outlined />
+              <button><picture-outlined :class="{active}" @click="active=!active" /></button>
+                
             </a-popover>
-            <!-- <span>@</span> -->
-            <clock-circle-filled />
+            <!-- <button><clock-circle-filled /></button> -->
+            <AppPickerComposition @updateEmoji="updateEmoji"/>
+            
           </div>
           <div class="right">
             <a-dropdown>
@@ -97,6 +99,7 @@ import {
   MailOutlined,
   
 } from '@ant-design/icons-vue';
+import AppPickerCompositionVue from "~/components/AppPickerComposition.vue";
 useHead({
 title: '动态',
 meta: [
@@ -106,6 +109,15 @@ meta: [
 const {user} = useStore();  
 // 动态文字
 let textValue = ref("");
+const updateEmoji = (emoji:any) => {
+  textValue.value += emoji;
+};
+
+// 点击了控制图片按钮高亮
+let active = ref(false);
+const visibleChange = (visible:boolean) => {
+  active.value = visible;
+}
 
 // 导航
 const current = ref<string[]>(['all']);
@@ -197,11 +209,10 @@ const handleChange = (info: UploadChangeParam) => {
         padding-bottom: 1rem;
 
         .left {
-          span{
+          button{
             cursor: pointer;
-            ~span {
-              margin-left: 1rem;
-              
+            ~button {
+              margin-left: .5rem;
             }
           }
           

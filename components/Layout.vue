@@ -15,7 +15,8 @@
             </Suspense>
             <template #placeholder>
               <div class="loading">
-                <loading-outlined />
+                <!-- <loading-outlined /> -->
+                ...
               </div>
             </template>
           </client-only>

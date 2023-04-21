@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <h1>{{ currentIdx }}</h1>
+  <!-- <div> -->
+    <!-- <h1>{{ currentIdx }}</h1>
     <button @click="cancel">撤销</button>
     <button @click="redo">取消撤销</button>
     <ul>
@@ -14,10 +14,11 @@
       <li v-for="(item,idx) in history" :key="idx">{{ item }}</li>
     </ul>
   </div>
-  <button @click="play" @click.once="submit">button</button>
+  <button @click="play" @click.once="submit">button</button> -->
 </template>
 
 <script setup lang="ts">
+
 const play = () => {
   console.log("play");
 }
