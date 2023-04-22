@@ -45,7 +45,7 @@ export const toggleLike = async (params:object) => {
 }
 
 
-// 查询是否已点赞
+// 查询点赞记录
 export const isLike = async (params:object) => {
     return await Http.post("like/isLike",params);
 }

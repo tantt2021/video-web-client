@@ -25,7 +25,7 @@
         </li>
       </ul>
       <a-button @click="jump('/message')"><send-outlined /></a-button>
-      <a-button @click="follow" :class="{'is-follow':isFollow?'isFollow':''}">{{isFollow?'已关注':'关注'}}</a-button>
+      <a-button @click="follow" :class="{'is-follow':!isFollow?'isFollow':''}">{{isFollow?'已关注':'关注'}}</a-button>
     </div>
 
     <main>

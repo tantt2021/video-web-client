@@ -15,4 +15,6 @@ export interface Video {
     type:string,
     videoFile:string,
     views:number,
+    liked:number,
+    stared:number,
 }

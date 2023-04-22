@@ -9,3 +9,8 @@ export const getDynamic = async (params:object) => {
 export const addDynamic = async (body:FormData) => {
     return await Http.post("dynamic/addDynamic",{},{},body);
 }
+
+// 删除动态
+export const DELDynamic = async (params:object) => {
+    return await Http.post("dynamic/delDynamic",params);
+}

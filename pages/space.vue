@@ -51,33 +51,10 @@
       </div>
       <p v-if="false">有新动态，点击查看</p>
       <div class="newest-action">
-        <action-item v-for="item in dynamics" :key="item.id" :content="item"/>
-
-        <!-- <a-menu v-model:selectedKeys="current" mode="horizontal">
-          <a-menu-item key="all"  @click="navigateTo('/space/all')">
-            
-            <template #icon>
-              <mail-outlined />
-            </template>
-            全部
-          </a-menu-item>
-          <a-menu-item key="text" @click="navigateTo('/space/text')">
-            <template #icon>
-              <mail-outlined />
-            </template>
-            文字
-          </a-menu-item>
-          <a-menu-item key="video" @click="navigateTo('/space/video')">
-            <template #icon>
-              <mail-outlined />
-            </template>
-            视频
-          </a-menu-item>
-        </a-menu> -->
-        <!-- <suspense>
-          <nuxt-page></nuxt-page>
-        </suspense> -->
+        <action-item v-for="item in dynamics" :key="item.id" :content="item" @reload="refreshDynamics"/>
       </div>
+      <p>没有更多啦，去看看其他的吧</p>
+
     </div>
   </template>
   
@@ -87,6 +64,7 @@ import { ref } from "vue";
 import {useRouter } from "vue-router";
 import ActionItem from "@/components/ActionItem.vue";
 import { getDynamic,addDynamic } from "~/api/dynamic";
+import {isLike} from "~/api/data";
 import useStore from "~/store";
 import type {TextDynaimcType} from "@/types";
 import { message } from "ant-design-vue";
@@ -99,7 +77,7 @@ import {
   MailOutlined,
   
 } from '@ant-design/icons-vue';
-import AppPickerCompositionVue from "~/components/AppPickerComposition.vue";
+import AppPickerComposition from "~/components/AppPickerComposition.vue";
 useHead({
 title: '动态',
 meta: [
@@ -128,6 +106,15 @@ await getDynamic({userId:user.id})
 .then(
   res => {
     dynamics.value = res.data;
+    // 查询点赞记录
+    isLike({
+      userId:user.id,
+      type:'dynamic'
+    }).then(
+      res => {
+        console.log("点赞记录",res);        
+      }
+    )
   }
 )
 // 发布动态
@@ -148,7 +135,6 @@ const submitDynamic = () => {
     res => {
       message.success("发布成功！");
       textValue.value = '';
-      // dynamicImgs.value = null;
       dynamicImgs.value = [];
       getDynamic({userId:user.id}).then(
         res => {
@@ -182,7 +168,15 @@ const handleChange = (info: UploadChangeParam) => {
   
 };
 
-
+// 子组件触发刷新，重新获取
+const refreshDynamics = () => {
+  getDynamic({userId:user.id}).then(
+    res => {
+      // 刷新，
+      dynamics.value = res.data;
+    }
+  )
+}
 
 
 
@@ -234,11 +228,13 @@ const handleChange = (info: UploadChangeParam) => {
     }
     .newest-action{
       box-shadow: 0px 0px 10px 0px #ddd;
-
+      
     }
     p{
       text-align: center;
-      background-color: #b0dda7;
+      // background-color: #b0dda7;
+      background-color: #f6f6f6;
+      color: #706e6e;
       font-weight: 400;
       padding: .3rem 0;
       margin: .5rem 0;

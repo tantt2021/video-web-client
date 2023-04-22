@@ -20,7 +20,7 @@
         <a-button
           :type="subscribe === '关注' ? 'primary' : 'dashed'"
           class="subscribe"
-          @click="addSubscribe"
+          @click="handleSubscribe"
           v-if="videoData.authorId!==user.id"
         >
           {{ subscribe }}
@@ -82,7 +82,7 @@
 
       <!-- 发弹幕 -->
       <div class="interaction">
-        <div>已装填xxx条弹幕</div>
+        <div>已装填{{videoData.marqueeCount}}条弹幕</div>
         <a-input-search
           v-model:value="marquee"
           placeholder="发个弹幕试试吧~"
@@ -110,20 +110,19 @@
       <h3>评论区</h3>
       <div class="mycomment">
         <img :src="user.avatar" alt="">
-        <input type="text" v-model="commentValue" placeholder="友善评论，尽情发言">
+        <div class="textarea">
+            <a-textarea  v-model:value="commentValue" placeholder="友善评论，尽情发言" />
+            <AppPickerComposition @updateEmoji="updateEmoji"/>
+        </div>
         <button @click="submitComment">发布</button>
       </div>
-      <comment :commentList="leverComment" :videoId="route.params.id" @add-comment="sonAddComment"/>
-    </div>
-    <div class="right-container">
-      
-      
+      <comment :commentList="leverComment" :videoId="route.params.id" @add-comment="sonAddComment" fatherType="video"/>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, onBeforeUnmount, onActivated } from "vue";
+import { ref, onMounted, onBeforeUnmount } from "vue";
 import {
   LikeTwoTone,
   StarTwoTone,
@@ -136,7 +135,7 @@ import { formatTime } from "@/utils/index";
 import Marque from "@/components/Marque.vue";
 import { getVideo,addVideoViews } from "~~/api/video";
 import { addHistory } from "~~/api/history";
-import { addStar,isStar,cancelStar,isLike,toggleLike,handleFollow, getComment, addComment } from "~~/api/data";
+import { addStar,isStar,cancelStar,toggleLike,handleFollow, getComment, addComment } from "~~/api/data";
 import type {Video,CommentType} from "@/types";
 import useStore from "~~/store";
 import {storeToRefs} from "pinia";
@@ -151,13 +150,12 @@ let videoData = ref<Video>({});
 let title = ref("");
 
 
-// 是否已关注
+// 是否已关注  点击事件
 let subscribe = ref("关注");
-let addSubscribe = () => {
+let handleSubscribe = () => {
   handleFollow({userId:user.id,followId:videoData.value.authorId}).then(
     res=>{
-      console.log(res,"关注");
-      
+      console.log(res,"操作关注");
     }
   )
   subscribe.value = subscribe.value === "已关注" ? "关注" : "已关注";
@@ -224,16 +222,14 @@ const handleScreen = (e: boolean) => {
 // 添加历史播放记录
 let once = true;
 const submitHistoryAndViews = () => {
-
   // 添加播放量
   addVideoViews({id:route.params.id});
   // 当前没有禁止记录历史
   if(!pause_history.value && once){
-      
       // 添加历史记录
       addHistory({userId:user.id,videoId:route.params.id}).then(
         res=>{
-          once = false;
+          once = false;   // 当前页面第一次点击播放键才添加播放量
         }
       )
     }
@@ -277,6 +273,7 @@ const changeVolume = (e: number) => {
 
 // 发送弹幕
 let marqueeArr = ref<string[]>([]);
+const submitMarque = () => {};
 // 弹幕
 let marquee = ref("");
 const sendMarquee = () => {
@@ -372,23 +369,14 @@ watch(
   }
 );
 
-// 发送弹幕
-const submitMarque = () => {};
+
 
 // 评论内容
 let  textarea1 = ref("");
 
 
-await getVideo({id:route.params.id,userId:user.id}).then(
-  res => {
-    videoData.value = res.data.videoInfo;
-    if(res.data.isFollow!==null){
-      subscribe.value = "已关注";
-    }
-  }
-)
-title.value = videoData.value.title;
-duration.value = videoData.value.duration;
+
+
 
 // 请求用户信息
 
@@ -400,27 +388,34 @@ let type = computed(()=>{
 
 //  点赞
 let likeColor = ref("#000");
-await isLike({userId:user.id,videoId:route.params.id}).then(
-  res => {
-    if(res.data==="该用户已点赞此视频"){
-      likeColor.value = "#44bc87";
-    }else{
-      likeColor.value = "#000";
-    }
-  }
-)
+
 const thumbup = async () => {
   // 请求添加点赞数据
-  await toggleLike({userId:user.id,videoId:route.params.id});
-  if(likeColor.value === "#000"){
-    likeColor.value = '#44bc87';
-    videoData.value.likeCount+=1;
+  await toggleLike({
+    userId:user.id,
+    hostId:route.params.id,
+    type:'video'
+  }).then(
+    res => {
+      if(likeColor.value === "#000"){
+        likeColor.value = '#44bc87';
+        videoData.value.likeCount+=1;
 
-  }else{
-    likeColor.value = '#000';
-    videoData.value.likeCount-=1;
-  }
+      }else{
+        likeColor.value = '#000';
+        videoData.value.likeCount-=1;
+      }
+    }
+  ).catch(
+    err => {
+      message.error(err);
+    }
+  )
+  
 }
+
+
+
 // 收藏
 let starColor = ref("#000");
 await isStar({userId:user.id,videoId:route.params.id}).then(
@@ -451,19 +446,20 @@ const collect = async () => {
 
 
 }
-// 分享
-// let shareColor = ref("#000");
-// const share = () => {
-//   // 请求分享
-//   if(shareColor.value === "#000"){
-//     shareColor.value = '#44bc87';
-//     // videoData.value.starCount+=1;
 
-//   }else{
-//     shareColor.value = '#000';
-//     // videoData.value.shareCount-=1;
-//   }
-// }
+await getVideo({videoId:route.params.id,userId:user.id}).then(
+  res => {
+    videoData.value = res.data.video;
+    if(res.data.author.is_followed){
+      subscribe.value = "已关注";
+    }
+    likeColor.value = res.data.author.is_liked === 1 ? "#44bc87" : '#000';
+    starColor.value = res.data.author.is_favorited === 1 ? "#44bc87" : '#000';
+    title.value = videoData.value.title;
+    duration.value = videoData.value.duration;
+    
+  }
+)
 
 // 获取评论
 let commentList = reactive<CommentType[]>([]);
@@ -501,6 +497,13 @@ let leverComment = computed(()=>{
 
 // 发表评论
 let commentValue = ref("");
+const updateEmoji = (emoji:any) => {
+    console.log(emoji);
+    
+    commentValue.value += emoji;
+    console.log(commentValue.value);
+    
+}
 const submitComment = () => {
   if(commentValue.value.trim()===''){
     message.error("评论内容不能为空");
@@ -523,22 +526,6 @@ const submitComment = () => {
           // 转化成父子评论
         }
       )
-      // let date = new Date();
-      // let DATE = `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`;
-      // commentList.push({
-      //   avatar:user.avatar,
-      //   content : commentValue.value,
-      //   createTime: DATE,
-      //   downvotes:0,
-      //   dynamic_id:route.params.id,
-      //   parent_id:'',
-      //   sonComment:[],
-      //   type:"video",
-      //   uname:user.username,
-      //   upvotes:0,
-      //   user_id:user.id
-
-      // });
       commentValue.value = '';
 
     }
@@ -683,7 +670,6 @@ const sonAddComment = () => {
   }
 }
 .mycomment {
-  // border: 1px solid #ddd;
   border-radius: 8px;
   padding: 10px;
   margin: 10px;
@@ -692,15 +678,13 @@ const sonAddComment = () => {
     height: 3rem;
     // width: 100%;
     border-radius: 50%;
+    margin-right: 1rem;
   }
-  input{
-    flex: 1;
-    height: 3rem;
-    padding: .2rem .7rem;
-    margin: 0 1rem;
-    background-color: #eee;
-    border: none;
-    border-radius: .4rem;
+  .textarea{
+    width: 100%;
+    textarea{
+        height: 5rem;
+    }
   }
   button{
     height: 3rem;
